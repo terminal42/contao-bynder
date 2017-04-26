@@ -1,0 +1,3 @@
+contao:
+    resource: "@Terminal42ContaoBynderBundle/Controller"
+    type: annotation

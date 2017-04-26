@@ -1,0 +1,17 @@
+{
+    "extends": "airbnb",
+    "installedESLint": true,
+    "env": {
+        "amd": true,
+        "commonjs": true,
+        "browser": true,
+        "es6": true,
+        "jquery": true
+    },
+    "rules": {
+        "func-names": 0,
+        "global-require": 0,
+        "indent": ["error", 4],
+        "import/no-extraneous-dependencies": 0
+    }
+}

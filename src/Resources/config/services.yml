@@ -1,0 +1,28 @@
+services:
+    terminal42.contao_bynder.picker_provider:
+        class: Terminal42\ContaoBynder\Menu\BynderAssetPickerProvider
+        arguments:
+            - "@router"
+            - "@request_stack"
+            - "%contao.upload_path%"
+        tags:
+            - { name: contao.picker_menu_provider }
+
+    terminal42.contao_bynder.event_listener.import_images:
+        class: Terminal42\ContaoBynder\EventListener\ImportImagesListener
+        arguments:
+            - "@request_stack"
+            - "@contao.framework"
+
+    terminal42.contao_bynder.api:
+        class: Bynder\Api\Impl\BynderApi
+        factory: ['Terminal42\ContaoBynder\Api', create]
+        arguments:
+            - 'settings' # Set based on configuration in extension
+
+    terminal42.contao_bynder.image_handler:
+        class: Terminal42\ContaoBynder\ImageHandler
+        arguments:
+            - "@terminal42.contao_bynder.api"
+            - '%contao.upload_path%'
+            - 'target_dir' # Set based on configuration in extension

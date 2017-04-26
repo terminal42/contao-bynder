@@ -1,0 +1,31 @@
+{
+    "name": "terminal42/contao-bynder",
+    "description": "Adds support for Bynder Asset Management to Contao Open Source CMS",
+    "type": "contao-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yanick Witschi",
+            "email": "yanick.witschi@terminal42.ch"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0,<8",
+        "contao/core-bundle": "dev-release/4.4.0",
+        "bynder/bynder-php-sdk": "^1.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.3",
+        "contao/manager-plugin": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terminal42\\ContaoBynder\\": "src"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "Terminal42\\ContaoBynder\\ContaoManager\\Plugin"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
