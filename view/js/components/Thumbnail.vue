@@ -1,5 +1,5 @@
 <template>
-    <div class="tl_left" style="padding-left:40px"> {{ name }} <span class="tl_gray">({{ meta }})</span><br>
+    <div class="tl_left" style="padding-left:40px"> {{ name }} <span class="tl_gray">{{ meta }}</span><br>
         <img
                 :src="thumb.src"
                 :width="thumb.width"

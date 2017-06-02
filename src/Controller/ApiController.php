@@ -10,6 +10,7 @@
 namespace Terminal42\ContaoBynder\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,19 +25,67 @@ class ApiController extends Controller
      *
      * @return Response
      *
-     * @Route("/_bynder_api", name="bynder_api")
+     * @Route("/_bynder_api/images", name="bynder_api")
      */
-    public function apiAction(Request $request)
+    public function imagesAction(Request $request)
     {
         $api = $this->get('terminal42.contao_bynder.api');
 
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
         $promise = $api->getAssetBankManager()->getMediaList();
 
-        $promise->then(function() {
-            dump(func_get_args());
+        $media = $promise->wait(function($media) {
+
         });
 
-        dump($request);exit;
+        $images = [];
+        foreach ($media as $imageData) {
+            $images[] = $this->prepareImage($imageData);
+        }
+
+        return new JsonResponse($images);
+    }
+
+    /**
+     * @param array $imageData
+     *
+     * @return array
+     */
+    private function prepareImage(array $imageData)
+    {
+        $thumb = (object) [
+            'src' => $imageData['thumbnails']['mini'],
+            'alt' => $imageData['name'],
+        ];
+
+        return [
+            'uuid' => $imageData['id'],
+            'selected' => false,
+            'name' => $imageData['name'],
+            'meta' => sprintf('%s (%sx%s px)',
+                $this->formatFilesize($imageData['fileSize']),
+                $imageData['width'],
+                $imageData['height']
+            ),
+            'thumb' => $thumb
+        ];
+    }
+
+    /**
+     * @param int $bytes
+     *
+     * @return string
+     */
+    private function formatFilesize($bytes)
+    {
+        $framework = $this->get('contao.framework');
+        $framework->initialize();
+
+        /** @var \Contao\System $system */
+        $system = $framework->getAdapter('Contao\System');
+
+        $system->loadLanguageFile('default');
+
+        return $system->getReadableSize($bytes);
     }
 }

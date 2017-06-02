@@ -35,39 +35,17 @@
         components: { Thumbnail, Radio, Checkbox },
         data () {
             return {
-                images: [
-                    {
-                        'uuid': 'bynder-asset:i-am-such-a-safe-uuid',
-                        'selected': false,
-                        'name': 'Special image',
-                        'meta': '200x300 foobar',
-                        'thumb': {
-                            'src': 'foobar.com',
-                            'width': 400,
-                            'height': 200,
-                            'alt': 'Foobar',
-                        }
-                    },
-                    {
-                        'uuid': 'bynder-asset:i-am-such-a-safe-uuid-2',
-                        'selected': false,
-                        'name': 'Special image',
-                        'meta': '200x300 foobar',
-                        'thumb': {
-                            'src': 'foobar.com',
-                            'width': 200,
-                            'height': 150,
-                            'alt': 'Foobar',
-                        }
-                    },
-                ]
+                images: []
             }
         },
 
         created() {
-            this.$http.get('/_bynder_api/images', function() {
-                console.log(arguments);
-            })
+            let self = this;
+            this.$http.get('/_bynder_api/images').then(
+                (data) => {
+                    self.images = data.body;
+                }
+            );
         }
     }
 </script>
