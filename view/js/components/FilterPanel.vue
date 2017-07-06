@@ -1,14 +1,26 @@
 <template>
-    <div v-if="hasFilters()">
-        <div class="tl_submit_panel tl_subpanel">
-            <button name="filter" id="filter" class="tl_img_submit filter_apply" title="" @click="applyFilters">{{ labels.apply }}</button>
-            <button name="filter_reset" id="filter_reset" value="1" class="tl_img_submit filter_reset" title="" @click="resetFilters">{{ labels.reset }}</button>
+    <div>
+        <div class="tl_panel cf">
+            <div class="tl_search tl_subpanel">
+                <strong>{{ labels.search }}:</strong>
+                <select name="tl_field" class="tl_select">
+                    <option value="keywords">{{ labels.keywords }}</option>
+                </select>
+                <span>=</span>
+                <input type="search" name="tl_value" class="tl_text" v-model="keywords">
+            </div>
         </div>
-        <div class="tl_filter tl_subpanel">
-            <strong>{{ labels.filter }}:</strong>
-            <select v-model="filterData[property]" v-for="(options, property) in filters" :name="property" :class="{ tl_select: true, active: filterData[property] !== '' }">
-                <option v-for="option in options" :value="option.value">{{ option.label }}</option>
-            </select>
+        <div v-if="hasFilters()" class="tl_panel cf">
+            <div class="tl_submit_panel tl_subpanel">
+                <button name="filter" id="filter" class="tl_img_submit filter_apply" title="" @click="applyFilters">{{ labels.apply }}</button>
+                <button name="filter_reset" id="filter_reset" value="1" class="tl_img_submit filter_reset" title="" @click="resetFilters">{{ labels.reset }}</button>
+            </div>
+            <div class="tl_filter tl_subpanel">
+                <strong>{{ labels.filter }}:</strong>
+                <select v-model="filterData[property]" v-for="(options, property) in filters" :name="property" :class="{ tl_select: true, active: filterData[property] !== '' }">
+                    <option v-for="option in options" :value="option.value">{{ option.label }}</option>
+                </select>
+            </div>
         </div>
     </div>
 </template>
@@ -29,6 +41,7 @@
         data() {
             return {
                 filterData: {},
+                keywords: '',
             }
         },
 
@@ -75,7 +88,7 @@
 
             applyFilters() {
                 this.$forceUpdate();
-                this.$emit('apply', this.filterData);
+                this.$emit('apply', this.filterData, this.keywords);
             },
 
             resetFilters() {
@@ -83,6 +96,8 @@
                     // Set default selected option
                     this.filterData[property] = '';
                 });
+                this.keywords = '';
+
                 this.$forceUpdate();
                 this.$emit('reset');
             }

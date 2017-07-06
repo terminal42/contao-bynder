@@ -75,6 +75,8 @@ class PickerController extends Controller
             'reset' => $GLOBALS['TL_LANG']['MSC']['reset'],
             'apply' => $GLOBALS['TL_LANG']['MSC']['apply'],
             'filter' => $GLOBALS['TL_LANG']['MSC']['filter'],
+            'search' => $GLOBALS['TL_LANG']['MSC']['search'],
+            'keywords' => $GLOBALS['TL_LANG']['MSC']['keywords'],
         ]);
 
         return <<<VIEW

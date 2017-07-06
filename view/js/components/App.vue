@@ -59,10 +59,14 @@
         },
 
         methods: {
-            applyFilter(filters) {
+            applyFilter(filters, keywords) {
 
                 let optionIds = [];
                 let queryString = '';
+
+                if ('' !== keywords) {
+                    queryString = 'keyword=' + keywords;
+                }
 
                 Object.keys(filters).forEach((property) => {
                     let optionId = filters[property];
@@ -73,7 +77,11 @@
                 });
 
                 if (optionIds.length) {
-                    queryString = 'propertyOptionId=' + optionIds.join(',');
+                    if ('' !== queryString) {
+                        queryString += '&';
+                    }
+
+                    queryString += 'propertyOptionId=' + optionIds.join(',');
                 }
 
                 this.updateImages(queryString);
@@ -86,7 +94,6 @@
             updateImages(queryString) {
                 queryString = queryString || '';
 
-                console.log(queryString);
                 let uri = '/_bynder_api/images' + (('' !== queryString) ? ('?' + queryString) : '');
 
                 console.log(uri);
