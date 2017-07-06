@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="tl_panel cf"><filter-panel :mediaproperties="mediaproperties"></filter-panel></div>
+        <div class="tl_panel cf"><filter-panel :mediaproperties="mediaproperties" :labels="labels" @apply="applyFilter" @reset="resetFilter"></filter-panel></div>
         <div class="tl_listing_container tree_view" id="tl_listing">
             <ul class="tl_listing picker unselectable" id="tl_select">
                 <li class="tl_folder_top cf"><div class="tl_left"><img src="bundles/terminal42contaobynder/bynder-logo.svg" width="18" height="18" alt=""> Bynder Asset Management</div></li>
@@ -32,26 +32,71 @@
                 type: String,
                 required: true,
             },
+            labels: {
+                type: Object,
+                required: true,
+            },
         },
+
         components: { FilterPanel, Thumbnail, Radio, Checkbox },
+
         data () {
             return {
                 mediaproperties: {},
-                images: []
+                images: [],
             }
         },
+
         created() {
+
             this.$http.get('/_bynder_api/mediaproperties').then(
                 (data) => {
                     this.mediaproperties = data.body;
                 }
             );
 
-            this.$http.get('/_bynder_api/images').then(
-                (data) => {
-                    this.images = data.body;
+            this.updateImages();
+        },
+
+        methods: {
+            applyFilter(filters) {
+
+                let optionIds = [];
+                let queryString = '';
+
+                Object.keys(filters).forEach((property) => {
+                    let optionId = filters[property];
+
+                    if ('' !== optionId) {
+                        optionIds.push(optionId);
+                    }
+                });
+
+                if (optionIds.length) {
+                    queryString = 'propertyOptionId=' + optionIds.join(',');
                 }
-            );
+
+                this.updateImages(queryString);
+            },
+
+            resetFilter() {
+                this.updateImages();
+            },
+
+            updateImages(queryString) {
+                queryString = queryString || '';
+
+                console.log(queryString);
+                let uri = '/_bynder_api/images' + (('' !== queryString) ? ('?' + queryString) : '');
+
+                console.log(uri);
+
+                this.$http.get(uri).then(
+                    (data) => {
+                        this.images = data.body;
+                    }
+                );
+            }
         }
     }
 </script>

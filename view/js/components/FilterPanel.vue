@@ -1,12 +1,12 @@
 <template>
     <div v-if="hasFilters()">
         <div class="tl_submit_panel tl_subpanel">
-            <button name="filter" id="filter" class="tl_img_submit filter_apply" title="">Apply</button>
-            <button name="filter_reset" id="filter_reset" value="1" class="tl_img_submit filter_reset" title="">Reset</button>
+            <button name="filter" id="filter" class="tl_img_submit filter_apply" title="" @click="applyFilters">{{ labels.apply }}</button>
+            <button name="filter_reset" id="filter_reset" value="1" class="tl_img_submit filter_reset" title="" @click="resetFilters">{{ labels.reset }}</button>
         </div>
         <div class="tl_filter tl_subpanel">
-            <strong>Filter:</strong>
-            <select v-for="(options, property) in filters" :name="property" class="tl_select">
+            <strong>{{ labels.filter }}:</strong>
+            <select v-model="filterData[property]" v-for="(options, property) in filters" :name="property" :class="{ tl_select: true, active: filterData[property] !== '' }">
                 <option v-for="option in options" :value="option.value">{{ option.label }}</option>
             </select>
         </div>
@@ -19,6 +19,16 @@
             mediaproperties: {
                 type: Object,
                 required: true,
+            },
+            labels: {
+                type: Object,
+                required: true,
+            }
+        },
+
+        data() {
+            return {
+                filterData: {},
             }
         },
 
@@ -35,11 +45,11 @@
                        // Add label and reset options first
                        filters[property].push({
                            label: filterDef.label,
-                           value: property
+                           value: ''
                        });
                        filters[property].push({
                            label: '---',
-                           value: property
+                           value: ''
                        });
 
                        filterDef.options.forEach((option) => {
@@ -48,6 +58,9 @@
                                value: option.id
                            })
                        });
+
+                       // Set default selected option
+                       this.filterData[property] = '';
                    }
                 });
 
@@ -60,9 +73,19 @@
                 return Object.keys(this.filters).length !== 0;
             },
 
-            changed(values) {
-                this.$emit('filtersChanged', values);
+            applyFilters() {
+                this.$forceUpdate();
+                this.$emit('apply', this.filterData);
             },
+
+            resetFilters() {
+                Object.keys(this.filters).forEach((property) => {
+                    // Set default selected option
+                    this.filterData[property] = '';
+                });
+                this.$forceUpdate();
+                this.$emit('reset');
+            }
         },
     };
 </script>

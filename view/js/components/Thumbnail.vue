@@ -5,7 +5,7 @@
                 :width="thumb.width"
                 :height="thumb.height"
                 :alt="thumb.alt"
-                style="margin:0 0 2px -19px"
+                style="margin:5px 0 2px -19px"
         >
     </div>
 </template>

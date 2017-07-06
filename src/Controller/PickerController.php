@@ -71,10 +71,16 @@ class PickerController extends Controller
      */
     private function getInitHtml($mode, $fieldName)
     {
+        $labels = json_encode((object) [
+            'reset' => $GLOBALS['TL_LANG']['MSC']['reset'],
+            'apply' => $GLOBALS['TL_LANG']['MSC']['apply'],
+            'filter' => $GLOBALS['TL_LANG']['MSC']['filter'],
+        ]);
+
         return <<<VIEW
 <div id="bynder_interface"></div>
 <script>
-window.initBynderInterface('#bynder_interface', {mode: '$mode', name: '$fieldName'});
+window.initBynderInterface('#bynder_interface', {mode: '$mode', name: '$fieldName', labels: $labels});
 </script>
 VIEW;
     }

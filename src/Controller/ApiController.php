@@ -51,7 +51,7 @@ class ApiController extends Controller
         $api = $this->get('terminal42.contao_bynder.api');
 
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
-        $promise = $api->getAssetBankManager()->getMediaList();
+        $promise = $api->getAssetBankManager()->getMediaList($request->getQueryString());
 
         $media = $promise->wait();
 
