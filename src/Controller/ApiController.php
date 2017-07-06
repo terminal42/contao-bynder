@@ -25,7 +25,26 @@ class ApiController extends Controller
      *
      * @return Response
      *
-     * @Route("/_bynder_api/images", name="bynder_api")
+     * @Route("/_bynder_api/mediaproperties", name="bynder_api_mediaproperties")
+     */
+    public function mediapropertiesAction(Request $request)
+    {
+        $api = $this->get('terminal42.contao_bynder.api');
+
+        /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
+        $promise = $api->getAssetBankManager()->getMetaproperties();
+
+        $properties = $promise->wait();
+
+        return new JsonResponse($properties);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     *
+     * @Route("/_bynder_api/images", name="bynder_api_images")
      */
     public function imagesAction(Request $request)
     {
@@ -34,9 +53,7 @@ class ApiController extends Controller
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
         $promise = $api->getAssetBankManager()->getMediaList();
 
-        $media = $promise->wait(function($media) {
-
-        });
+        $media = $promise->wait();
 
         $images = [];
         foreach ($media as $imageData) {
