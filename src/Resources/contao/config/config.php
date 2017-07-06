@@ -8,8 +8,8 @@
  */
 
 if (TL_MODE === 'BE') {
-    $GLOBALS['TL_CSS'][] = 'bundles/contaobynder/styles.min.css|static';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/contaobynder/app.min.js|static';
+    $GLOBALS['TL_CSS'][] = 'bundles/terminal42contaobynder/styles.min.css|static';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/terminal42contaobynder/app.min.js|static';
 }
 
 /*
