@@ -47,7 +47,8 @@ gulp.task('compile', ['compile-js', 'compile-sass']);
 
 // Watch task
 gulp.task('watch', function () {
-    gulp.watch(['view/**'], ['compile']);
+    gulp.watch(['view/css/**'], ['compile-sass']);
+    gulp.watch(['view/js/**'], ['compile-js']);
 });
 
 // Default task
