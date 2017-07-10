@@ -3,11 +3,11 @@
         <div class="tl_panel cf">
             <div class="tl_search tl_subpanel">
                 <strong>{{ labels.search }}:</strong>
-                <select name="tl_field" class="tl_select">
+                <select name="tl_field" :class="{ tl_select: true, active: filterActive && keywords !== '' }">
                     <option value="keywords">{{ labels.keywords }}</option>
                 </select>
                 <span>=</span>
-                <input type="search" name="tl_value" class="tl_text" v-model="keywords">
+                <input type="search" name="tl_value" :class="{ tl_text: true, active: filterActive && keywords !== '' }" v-model="keywords">
             </div>
         </div>
         <div v-if="hasFilters()" class="tl_panel cf">
@@ -17,7 +17,7 @@
             </div>
             <div class="tl_filter tl_subpanel">
                 <strong>{{ labels.filter }}:</strong>
-                <select v-model="filterData[property]" v-for="(options, property) in filters" :name="property" :class="{ tl_select: true, active: filterData[property] !== '' }">
+                <select v-model="filterData[property]" v-for="(options, property) in filters" :name="property" :class="{ tl_select: true, active: filterActive && filterData[property] !== '' }">
                     <option v-for="option in options" :value="option.value">{{ option.label }}</option>
                 </select>
             </div>
@@ -42,6 +42,7 @@
             return {
                 filterData: {},
                 keywords: '',
+                filterActive: false
             }
         },
 
@@ -87,7 +88,7 @@
             },
 
             applyFilters() {
-                this.$forceUpdate();
+                this.filterActive = true;
                 this.$emit('apply', this.filterData, this.keywords);
             },
 
@@ -98,7 +99,7 @@
                 });
                 this.keywords = '';
 
-                this.$forceUpdate();
+                this.filterActive = false;
                 this.$emit('reset');
             }
         },
