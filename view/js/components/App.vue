@@ -2,7 +2,8 @@
     <div id="bynder-asset-mgmt">
         <div class="tl_panel cf"><filter-panel :mediaproperties="mediaproperties" :labels="labels" @apply="applyFilter" @reset="resetFilter"></filter-panel></div>
         <div class="tl_listing_container tree_view" id="tl_listing">
-            <div v-if="loading" class="loader">Loading…</div>
+            <div v-if="loading" class="loader">{{ labels.loadingData }}</div>
+            <div v-else-if="!hasImages()">{{ labels.noResult }}</div>
             <ul v-else class="tl_listing picker unselectable" id="tl_select">
                 <li class="tl_folder_top cf"><div class="tl_left"><img src="bundles/terminal42contaobynder/bynder-logo.svg" width="18" height="18" alt=""> Bynder Asset Management</div></li>
                 <li class="tl_file click2edit toggle_select hover-div" v-for="image in images">
@@ -61,6 +62,11 @@
         },
 
         methods: {
+
+            hasImages() {
+                return this.images.length !== 0;
+            },
+
             applyFilter(filters, keywords) {
 
                 let optionIds = [];
