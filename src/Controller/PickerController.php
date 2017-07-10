@@ -82,6 +82,7 @@ class PickerController extends Controller
         ]);
 
         return <<<VIEW
+<div class="tl_tree_radio"></div>
 <div id="bynder_interface"></div>
 <script>
 window.initBynderInterface('#bynder_interface', {mode: '$mode', name: '$fieldName', labels: $labels});
