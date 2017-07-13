@@ -17,11 +17,6 @@ use Terminal42\ContaoBynder\ImageHandler;
 class ImportImagesListener
 {
     /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
-
-    /**
      * @var RequestStack
      */
     private $requestStack;
@@ -34,13 +29,11 @@ class ImportImagesListener
     /**
      * ImportImagesListener constructor.
      *
-     * @param ContaoFrameworkInterface $framework
      * @param                          $requestStack
      * @param ImageHandler             $imageHandler
      */
-    public function __construct(ContaoFrameworkInterface $framework, $requestStack, ImageHandler $imageHandler)
+    public function __construct($requestStack, ImageHandler $imageHandler)
     {
-        $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->imageHandler = $imageHandler;
     }

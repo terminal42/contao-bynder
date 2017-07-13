@@ -10,6 +10,7 @@
 namespace Terminal42\ContaoBynder;
 
 use Bynder\Api\IBynderApi;
+use GuzzleHttp\Client;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ImageHandler
@@ -64,14 +65,14 @@ class ImageHandler
         }
 
         $promise = $this->api->getRequestHandler()->sendRequestAsync('GET', 'api/v4/media/' . $mediaId . '/download', [
-            'query' => 'type=original'
+            'query' => 'type=original' // TODO, the original is never what we want!
         ]);
 
-        $promise->then(function() {
-            dump(func_get_args());
-        });
+        $location = $promise->wait();
 
-        $content = '';
+        $client = new Client();
+        $result = $client->request('GET', $location['s3_file']);
+        $content = $result->getBody()->getContents();
 
         // Dump the contents
         $this->filesystem->dumpFile($absoluteTargetPath, $content);
@@ -96,10 +97,11 @@ class ImageHandler
      */
     private function getTargetPathForMediaId($mediaId)
     {
-        $info = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
+        $promise = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
 
-        // TODO get extension
-        $extension = $info['extension'];
+        $info = $promise->wait();
+
+        $extension = $info['extension'][0];
 
         return $this->uploadPath
             . DIRECTORY_SEPARATOR

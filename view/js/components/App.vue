@@ -9,8 +9,8 @@
                 <li class="tl_file click2edit toggle_select hover-div" v-for="image in images">
                     <thumbnail :name="image.name" :meta="image.meta" :thumb="image.thumb"></thumbnail>
                     <div class="tl_right">
-                        <radio v-if="mode == 'radio'" :name="name" :value="image.uuid" :checked="image.selected"></radio>
-                        <checkbox v-else :name="name" :value="image.uuid" :checked="image.selected"></checkbox>
+                        <radio v-if="mode == 'radio'" :name="name" :value="image.value" :checked="image.selected"></radio>
+                        <checkbox v-else :name="name" :value="image.value" :checked="image.selected"></checkbox>
                     </div>
                     <div style="clear:both"></div>
                 </li>

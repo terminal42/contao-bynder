@@ -60,6 +60,8 @@ class ApiController extends Controller
             $images[] = $this->prepareImage($imageData);
         }
 
+        // TODO filter for valid images (extensions!)
+
         return new JsonResponse($images);
     }
 
@@ -77,7 +79,8 @@ class ApiController extends Controller
 
         return [
             'uuid' => $imageData['id'],
-            'selected' => false,
+            'value' => 'bynder-asset:' . $imageData['id'],
+            'selected' => false, // TODO
             'name' => $imageData['name'],
             'meta' => sprintf('%s (%sx%s px)',
                 $this->formatFilesize($imageData['fileSize']),

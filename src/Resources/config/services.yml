@@ -12,7 +12,7 @@ services:
         class: Terminal42\ContaoBynder\EventListener\ImportImagesListener
         arguments:
             - "@request_stack"
-            - "@contao.framework"
+            - "@terminal42.contao_bynder.image_handler"
 
     terminal42.contao_bynder.api:
         class: Bynder\Api\Impl\BynderApi
