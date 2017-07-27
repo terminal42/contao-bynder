@@ -13,11 +13,14 @@ use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Picker\PickerBuilderInterface;
+use Contao\CoreBundle\Picker\PickerInterface;
 use Contao\System;
 use Environment;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -34,6 +37,18 @@ class PickerController extends Controller
      */
     public function pickerAction(Request $request)
     {
+        if (!$request->query->has('picker')) {
+            throw new BadRequestHttpException('Bynder Asset picker is supposed to be used within the Contao picker.');
+        }
+
+        /** @var PickerBuilderInterface $pickerBuilder */
+        $pickerBuilder = $this->get('contao.picker.builder');
+        $picker = $pickerBuilder->createFromData($request->query->get('picker'));
+
+        if (null === $picker) {
+            throw new BadRequestHttpException('Bynder Asset picker is supposed to have some data.');
+        }
+
         /** @var ContaoFrameworkInterface $framework */
         $framework = $this->get('contao.framework');
         $framework->initialize();
@@ -46,14 +61,19 @@ class PickerController extends Controller
         $controller = $framework->getAdapter(\Contao\Controller::class);
         $controller->setStaticUrls();
 
-        /** @var \Contao\CoreBundle\Menu\PickerMenuBuilderInterface $menuBuilder */
-        $menuBuilder = $this->get('contao.menu.picker_menu_builder');
-
         $template = new BackendTemplate('be_main');
-        $template->main = $this->getInitHtml('radio', 'singleSRC'); // TODO implement
+
+        /** @var PickerBuilderInterface $pickerBuilder */
+        $pickerBuilder = $this->get('contao.picker.builder');
+        $picker = $pickerBuilder->createFromData($request->query->get('picker'));
+
+        if (($menu = $picker->getMenu()) && $menu->count() > 1) {
+            $template->pickerMenu = $this->get('contao.menu.renderer')->render($menu);
+        }
+
+        $template->main = $this->getInitHtml($picker); // TODO implement
         $template->title = 'Bynder Asset Management';
         $template->headline = 'Bynder Asset Management';
-        $template->pickerMenu = $menuBuilder->createMenu($request->query->get('context'));
         $template->isPopup = true;
         $template->theme = Backend::getTheme();
         $template->base = Environment::get('base');
@@ -64,13 +84,17 @@ class PickerController extends Controller
     }
 
     /**
-     * @param string $mode
-     * @param string $fieldName
+     *
+     * @param PickerInterface $picker
      *
      * @return string
      */
-    private function getInitHtml($mode, $fieldName)
+    private function getInitHtml(PickerInterface $picker)
     {
+        $config = $picker->getConfig();
+
+        $mode = $config->getExtra('fieldType');
+
         $labels = json_encode((object) [
             'reset' => $GLOBALS['TL_LANG']['MSC']['reset'],
             'apply' => $GLOBALS['TL_LANG']['MSC']['apply'],
@@ -85,7 +109,7 @@ class PickerController extends Controller
 <div class="tl_tree_radio"></div>
 <div id="bynder_interface"></div>
 <script>
-window.initBynderInterface('#bynder_interface', {mode: '$mode', name: '$fieldName', labels: $labels});
+window.initBynderInterface('#bynder_interface', {mode: '$mode', labels: $labels});
 </script>
 VIEW;
     }

@@ -1,12 +1,11 @@
 services:
     terminal42.contao_bynder.picker_provider:
-        class: Terminal42\ContaoBynder\Menu\BynderAssetPickerProvider
+        class: Terminal42\ContaoBynder\Picker\BynderAssetPickerProvider
         arguments:
+            - "@knp_menu.factory"
             - "@router"
-            - "@request_stack"
-            - "%contao.upload_path%"
         tags:
-            - { name: contao.picker_menu_provider }
+            - { name: contao.picker_provider }
 
     terminal42.contao_bynder.event_listener.import_images:
         class: Terminal42\ContaoBynder\EventListener\ImportImagesListener
