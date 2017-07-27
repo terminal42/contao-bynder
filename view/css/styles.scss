@@ -5,6 +5,24 @@
   }
 }
 
+#bynder-asset-mgmt .download-button {
+
+  @import 'loading';
+  @import 'loading-btn';
+
+  .button {
+    cursor: pointer;
+    display: inline-block;
+    background: #0af;
+    border-width: 0;
+    padding: 5px 15px 5px 15px;
+  }
+
+  .button > .ld:after {
+    box-sizing: border-box;
+  }
+}
+
 #bynder-asset-mgmt {
   .loader,
   .loader:before,
