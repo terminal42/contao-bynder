@@ -9,6 +9,8 @@
 
 namespace Terminal42\ContaoBynder\Controller;
 
+use Contao\StringUtil;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,8 +58,9 @@ class ApiController extends Controller
         $media = $promise->wait();
 
         $images = [];
+        $downloaded = $this->fetchDownloaded($media);
         foreach ($media as $imageData) {
-            $images[] = $this->prepareImage($imageData);
+            $images[] = $this->prepareImage($imageData, $downloaded);
         }
 
         // TODO filter for valid images (extensions!)
@@ -70,17 +73,20 @@ class ApiController extends Controller
      *
      * @return array
      */
-    private function prepareImage(array $imageData)
+    private function prepareImage(array $imageData, array $downloaded)
     {
         $thumb = (object) [
             'src' => $imageData['thumbnails']['mini'],
             'alt' => $imageData['name'],
         ];
 
-        return [
-            'uuid' => $imageData['id'],
-            'value' => 'bynder-asset:' . $imageData['id'],
+        $bynderId = $imageData['id'];
+
+        $data = [
+            'bynder_id' => $bynderId,
+           // 'value' => 'bynder-asset:' . $imageData['id'],
             'selected' => false, // TODO
+            'downloaded' => false,
             'name' => $imageData['name'],
             'meta' => sprintf('%s (%sx%s px)',
                 $this->formatFilesize($imageData['fileSize']),
@@ -89,6 +95,13 @@ class ApiController extends Controller
             ),
             'thumb' => $thumb
         ];
+
+        if (isset($downloaded[$bynderId])) {
+            $data['downloaded'] = true;
+            $data['uuid'] = $downloaded[$bynderId];
+        }
+
+        return $data;
     }
 
     /**
@@ -107,5 +120,33 @@ class ApiController extends Controller
         $system->loadLanguageFile('default');
 
         return $system->getReadableSize($bytes);
+    }
+
+    /**
+     * @param array $media
+     *
+     * @return array
+     */
+    private function fetchDownloaded(array $media)
+    {
+        $bynderIds = [];
+
+        foreach ($media as $imageData) {
+            $bynderIds[] = $imageData['id'];
+        }
+
+        $connection = $this->get('doctrine.dbal.default_connection');
+        $stmt = $connection->executeQuery('SELECT uuid, bynder_id FROM tl_files WHERE bynder_id IN (?)',
+            [$bynderIds],
+            [Connection::PARAM_INT_ARRAY]
+        );
+
+        $downloaded = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $downloaded[$row['bynder_id']] = StringUtil::binToUuid($row['uuid']);
+        }
+
+        return $downloaded;
     }
 }
