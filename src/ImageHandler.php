@@ -10,6 +10,9 @@
 namespace Terminal42\ContaoBynder;
 
 use Bynder\Api\IBynderApi;
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\Dbafs;
+use Contao\StringUtil;
 use GuzzleHttp\Client;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -19,6 +22,15 @@ class ImageHandler
      * @var IBynderApi
      */
     private $api;
+    /**
+     * @var ContaoFrameworkInterface
+     */
+    private $contaoFramework;
+
+    /**
+     * @var string
+     */
+    private $rootDir;
 
     /**
      * @var string
@@ -38,13 +50,17 @@ class ImageHandler
     /**
      * ImageHandler constructor.
      *
-     * @param Api    $api
-     * @param string $uploadPath
-     * @param string $targetDir
+     * @param Api                      $api
+     * @param ContaoFrameworkInterface $contaoFramework
+     * @param                          $rootDir
+     * @param string                   $uploadPath
+     * @param string                   $targetDir
      */
-    public function __construct(Api $api, $uploadPath, $targetDir)
+    public function __construct(Api $api, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath, $targetDir)
     {
         $this->api = $api;
+        $this->contaoFramework = $contaoFramework;
+        $this->rootDir = $rootDir;
         $this->uploadPath = $uploadPath;
         $this->targetDir = trim($targetDir, '/');
         $this->filesystem = new Filesystem();
@@ -52,32 +68,39 @@ class ImageHandler
 
     /**
      * @param string $mediaId
+     * @param string $mediaHash
      *
-     * @return string The file path relative to the uploadPath
+     * @return string The Contao file system UUID
      */
-    public function importImage($mediaId)
+    public function importImage($mediaId, $mediaHash)
     {
         $absoluteTargetPath = $this->getTargetPathForMediaId($mediaId);
 
-        if (file_exists($absoluteTargetPath)) {
+        // TODO, wait for the new API and get a preconfigured, high-res jpgeg here
 
-            return $this->getUploadPathRelativePath($absoluteTargetPath);
-        }
+        /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
+        $promise = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
 
-        $promise = $this->api->getRequestHandler()->sendRequestAsync('GET', 'api/v4/media/' . $mediaId . '/download', [
-            'query' => 'type=original' // TODO, the original is never what we want!
-        ]);
-
-        $location = $promise->wait();
+        $media = $promise->wait();
 
         $client = new Client();
-        $result = $client->request('GET', $location['s3_file']);
+        $result = $client->request('GET', $media['thumbnails']['webimage']);
         $content = $result->getBody()->getContents();
 
         // Dump the contents
         $this->filesystem->dumpFile($absoluteTargetPath, $content);
+        $relativePath = $this->getUploadPathRelativePath($absoluteTargetPath);
 
-        return $this->getUploadPathRelativePath($absoluteTargetPath);
+        /** @var Dbafs $dbafs */
+        $dbafs = $this->contaoFramework->getAdapter(Dbafs::class);
+        $model = $dbafs->addResource($relativePath);
+
+        // Add bynder attributes
+        $model->bynder_id = $mediaId;
+        $model->bynder_hash = $mediaHash;
+        $model->save();
+
+        return StringUtil::binToUuid($model->uuid);
     }
 
     /**
@@ -87,7 +110,7 @@ class ImageHandler
      */
     private function getUploadPathRelativePath($absolutePath)
     {
-        return $this->filesystem->makePathRelative($absolutePath, $this->uploadPath);
+        return rtrim($this->filesystem->makePathRelative($absolutePath, $this->getAbsoluteProjectDir()), '/');
     }
 
     /**
@@ -103,11 +126,26 @@ class ImageHandler
 
         $extension = $info['extension'][0];
 
-        return $this->uploadPath
+        return $this->getAbsoluteProjectDir()
+            . DIRECTORY_SEPARATOR
+            . $this->uploadPath
             . DIRECTORY_SEPARATOR
             . $this->targetDir
             . DIRECTORY_SEPARATOR
             . $mediaId
+            . '.'
             . $extension;
+    }
+
+    /**
+     * @return string
+     */
+    private function getAbsoluteProjectDir()
+    {
+        return realpath($this->rootDir
+            . DIRECTORY_SEPARATOR
+            . '..'
+            . DIRECTORY_SEPARATOR
+        );
     }
 }
