@@ -79,10 +79,11 @@ class ApiController extends Controller
         ];
 
         $bynderId = $imageData['id'];
+        $bynderHash = $imageData['idHash'];
 
         $data = [
             'bynder_id' => $bynderId,
-           // 'value' => 'bynder-asset:' . $imageData['id'],
+            'bynder_hash' => $bynderHash,
             'selected' => false, // TODO
             'downloaded' => false,
             'name' => $imageData['name'],
@@ -95,7 +96,7 @@ class ApiController extends Controller
         ];
 
         if (isset($downloaded[$bynderId])) {
-            $data['downloaded'] = $downloaded[$bynderId]['bynder_hash'] === $imageData['idHash'];
+            $data['downloaded'] = $downloaded[$bynderId]['bynder_hash'] === $bynderHash;
             $data['uuid'] = $downloaded[$bynderId]['uuid'];
         }
 
