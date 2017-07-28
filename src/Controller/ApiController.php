@@ -63,8 +63,6 @@ class ApiController extends Controller
             $images[] = $this->prepareImage($imageData, $downloaded);
         }
 
-        // TODO filter for valid images (extensions!)
-
         return new JsonResponse($images);
     }
 
