@@ -97,8 +97,8 @@ class ApiController extends Controller
         ];
 
         if (isset($downloaded[$bynderId])) {
-            $data['downloaded'] = true;
-            $data['uuid'] = $downloaded[$bynderId];
+            $data['downloaded'] = $downloaded[$bynderId]['bynder_hash'] === $imageData['idHash'];
+            $data['uuid'] = $downloaded[$bynderId]['uuid'];
         }
 
         return $data;
@@ -136,7 +136,7 @@ class ApiController extends Controller
         }
 
         $connection = $this->get('doctrine.dbal.default_connection');
-        $stmt = $connection->executeQuery('SELECT uuid, bynder_id FROM tl_files WHERE bynder_id IN (?)',
+        $stmt = $connection->executeQuery('SELECT uuid,bynder_id,bynder_hash FROM tl_files WHERE bynder_id IN (?)',
             [$bynderIds],
             [Connection::PARAM_INT_ARRAY]
         );
@@ -144,7 +144,10 @@ class ApiController extends Controller
         $downloaded = [];
 
         foreach ($stmt->fetchAll() as $row) {
-            $downloaded[$row['bynder_id']] = StringUtil::binToUuid($row['uuid']);
+            $downloaded[$row['bynder_id']] = [
+                'uuid' => StringUtil::binToUuid($row['uuid']),
+                'bynder_hash' => $row['bynder_hash'],
+            ];
         }
 
         return $downloaded;
