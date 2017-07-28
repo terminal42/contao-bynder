@@ -7,12 +7,6 @@ services:
         tags:
             - { name: contao.picker_provider }
 
-    terminal42.contao_bynder.event_listener.import_images:
-        class: Terminal42\ContaoBynder\EventListener\ImportImagesListener
-        arguments:
-            - "@request_stack"
-            - "@terminal42.contao_bynder.image_handler"
-
     terminal42.contao_bynder.api:
         class: Bynder\Api\Impl\BynderApi
         factory: ['Terminal42\ContaoBynder\Api', create]
@@ -23,5 +17,7 @@ services:
         class: Terminal42\ContaoBynder\ImageHandler
         arguments:
             - "@terminal42.contao_bynder.api"
+            - "@contao.framework"
+            - '%kernel.root_dir%'
             - '%contao.upload_path%'
             - 'target_dir' # Set based on configuration in extension
