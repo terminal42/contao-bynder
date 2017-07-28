@@ -2,13 +2,13 @@
     <div>
         <thumbnail :name="image.name" :meta="image.meta" :thumb="image.thumb"></thumbnail>
         <div class="tl_right download-button">
-            <div class="button ld ld-over-inverse">
-                <div class="ld ld-ring ld-spin"></div>
+            <div v-if="!image.downloaded" :class="{ 'button': true, 'ld': true, 'ld-over-inverse': true, running: this.isDownloading }" @click="downloadImage()">
+                <div class="ld ld-ring l-spin"></div>
                 <div></div>
                 <img src="bundles/terminal42contaobynder/download.svg" width="20">
             </div>
-            <radio v-if="mode == 'radio'" name="picker" :value="image.value" :checked="image.selected" :disabled="disabled"></radio>
-            <checkbox v-else name="picker[]" :value="image.uuid" :checked="image.selected" :disabled="disabled"></checkbox>
+            <radio v-if="mode == 'radio'" name="picker" :value="image.uuid" :checked="image.selected" :disabled="!image.downloaded"></radio>
+            <checkbox v-else name="picker[]" :value="image.uuid" :checked="image.selected" :disabled="!image.downloaded"></checkbox>
         </div>
         <div style="clear:both"></div>
     </div>
@@ -29,12 +29,34 @@
                 required: true,
             },
         },
-        computed: {
-            disabled() {
-                return !this.image.downloaded;
+
+        components: { Thumbnail, Radio, Checkbox },
+
+        data() {
+            return {
+                isDownloading: false,
             }
         },
 
-        components: { Thumbnail, Radio, Checkbox },
+        methods: {
+            downloadImage() {
+                if (this.image.downloaded || this.isDownloading) {
+                    return;
+                }
+
+                this.isDownloading = true;
+
+                let uri = '/_bynder_api/download?mediaId=' + this.image.bynder_id + '&mediaHash=' + this.image.bynder_hash;
+
+                this.$http.get(uri).then(
+                    (data) => {
+                        this.image.downloaded = true;
+                        this.image.uuid = data.body.uuid;
+                    }
+                ).catch(() => {
+                    // TODO
+                });
+            }
+        }
     }
 </script>
