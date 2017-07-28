@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Terminal42\ContaoBynder\ImageHandler;
 
 /**
  * @Route(defaults={"_scope" = "backend"})
@@ -64,6 +65,32 @@ class ApiController extends Controller
         }
 
         return new JsonResponse($images);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     *
+     * @Route("/_bynder_api/download", name="bynder_api_download")
+     */
+    public function downloadAction(Request $request)
+    {
+        /** @var ImageHandler $imageHandler */
+        $imageHandler = $this->get('terminal42.contao_bynder.image_handler');
+        $mediaId = $request->query->get('mediaId');
+        $mediaHash = $request->query->get('mediaHash');
+
+        $clean = function($v) {
+            return preg_replace('/[^a-zA-Z\d-]/', '', $v);
+        };
+
+        $mediaId = $clean($mediaId);
+        $mediaHash = $clean($mediaHash);
+
+        $uuid = $imageHandler->importImage($mediaId, $mediaHash);
+
+        return new JsonResponse(['uuid' => $uuid]);
     }
 
     /**
