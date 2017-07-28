@@ -110,15 +110,15 @@
                 let hasFilters = false;
 
                 Object.keys(this.filters).forEach((property) => {
-                    hasFilters = this.isFilterActive(property);
+                    if (!hasFilters && this.isFilterActive(property)) {
+                        hasFilters = true;
+                    }
                 });
 
                 return '' !== this.keywords || hasFilters;
             },
 
             resetFilters() {
-                this.filtersApplied = false;
-
                 Object.keys(this.filters).forEach((property) => {
                     // Set default selected option
                     this.filterData[property] = '';
