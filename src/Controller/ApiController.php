@@ -81,7 +81,7 @@ class ApiController extends Controller
         $mediaId = $request->query->get('mediaId');
         $mediaHash = $request->query->get('mediaHash');
 
-        $clean = function($v) {
+        $clean = function ($v) {
             return preg_replace('/[^a-zA-Z\d-]/', '', $v);
         };
 
@@ -119,7 +119,7 @@ class ApiController extends Controller
                 $imageData['width'],
                 $imageData['height']
             ),
-            'thumb' => $thumb
+            'thumb' => $thumb,
         ];
 
         if (isset($downloaded[$bynderId])) {

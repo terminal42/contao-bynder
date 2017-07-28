@@ -84,7 +84,6 @@ class PickerController extends Controller
     }
 
     /**
-     *
      * @param PickerInterface $picker
      *
      * @return string

@@ -31,7 +31,7 @@
 
         components: { FilterPanel, ImageRow },
 
-        data () {
+        data() {
             return {
                 mediaproperties: {},
                 images: [],
