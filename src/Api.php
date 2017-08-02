@@ -21,6 +21,11 @@ use Bynder\Api\Impl\Oauth\OauthRequestHandler;
 class Api extends BynderApi
 {
     /**
+     * @var string
+     */
+    private $baseUrl;
+
+    /**
      * @var OauthRequestHandler
      */
     private $requestHandler;
@@ -35,7 +40,16 @@ class Api extends BynderApi
     {
         parent::__construct($baseUrl, $requestHandler);
 
+        $this->baseUrl = $baseUrl;
         $this->requestHandler = $requestHandler;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->baseUrl;
     }
 
     /**

@@ -46,12 +46,14 @@
 
                 this.isDownloading = true;
 
-                let uri = '/_bynder_api/download?mediaId=' + this.image.bynder_id + '&mediaHash=' + this.image.bynder_hash;
+                let uri = '/_bynder_api/download?mediaId=' + this.image.bynder_id;
 
                 this.$http.get(uri).then(
                     (data) => {
-                        this.image.downloaded = true;
-                        this.image.uuid = data.body.uuid;
+                        if ('OK' === data.body.status) {
+                            this.image.uuid = data.body.uuid;
+                            this.image.downloaded = true;
+                        }
                     }
                 ).catch(() => {
                     // TODO

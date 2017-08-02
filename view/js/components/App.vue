@@ -88,11 +88,6 @@
 
                 queryString = queryString || {};
 
-                queryString = Object.assign({
-                    limit: 25
-                }, queryString);
-
-
                 queryString = this.buildQueryString(queryString);
                 this.loading = true;
 

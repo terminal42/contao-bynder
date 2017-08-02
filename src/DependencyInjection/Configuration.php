@@ -57,6 +57,12 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                     ->defaultValue('bynder_assets')
                 ->end()
+                ->scalarNode('derivativeName')
+                    ->info('The derivativeName contains the derivative you added in Bynder. It will be used to fetch a derivative of the original when downloading it to your Contao installation.')
+                    ->example('contao_derivative')
+                    ->cannotBeEmpty()
+                    ->isRequired()
+                ->end()
             ->end()
         ;
 

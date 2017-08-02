@@ -11,9 +11,12 @@ namespace Terminal42\ContaoBynder;
 
 use Bynder\Api\IBynderApi;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Dbafs;
 use Contao\StringUtil;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ImageHandler
@@ -22,6 +25,22 @@ class ImageHandler
      * @var IBynderApi
      */
     private $api;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var string
+     */
+    private $derivativeName;
+
+    /**
+     * @var string
+     */
+    private $targetDir;
+
     /**
      * @var ContaoFrameworkInterface
      */
@@ -38,11 +57,6 @@ class ImageHandler
     private $uploadPath;
 
     /**
-     * @var string
-     */
-    private $targetDir;
-
-    /**
      * @var Filesystem
      */
     private $filesystem;
@@ -51,43 +65,79 @@ class ImageHandler
      * ImageHandler constructor.
      *
      * @param Api                      $api
+     * @param LoggerInterface          $logger
+     * @param                          $derivativeName
+     * @param                          $targetDir
      * @param ContaoFrameworkInterface $contaoFramework
      * @param                          $rootDir
      * @param string                   $uploadPath
-     * @param string                   $targetDir
      */
-    public function __construct(Api $api, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath, $targetDir)
+    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, $targetDir, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath)
     {
         $this->api = $api;
+        $this->logger = $logger;
+        $this->derivativeName = $derivativeName;
+        $this->targetDir = trim($targetDir, '/');
         $this->contaoFramework = $contaoFramework;
         $this->rootDir = $rootDir;
         $this->uploadPath = $uploadPath;
-        $this->targetDir = trim($targetDir, '/');
         $this->filesystem = new Filesystem();
     }
 
     /**
      * @param string $mediaId
-     * @param string $mediaHash
      *
-     * @return string The Contao file system UUID
+     * @return string|false The Contao file system UUID on success or false if something went wrong.
      */
-    public function importImage($mediaId, $mediaHash)
+    public function importImage($mediaId)
     {
-        $absoluteTargetPath = $this->getTargetPathForMediaId($mediaId);
+        $uri = sprintf('images/media/%s/derivatives/%s/',
+            $mediaId,
+            $this->derivativeName
+        );
 
-        // TODO, wait for the new API and get a preconfigured, high-res jpgeg here
+        try {
+            $client = new Client();
+            $result = $client->request('GET', $uri, [
+                'base_uri' => $this->api->getBaseUrl(),
+                'allow_redirects' => true,
+                'timeout' => 8,
+            ]);
+        } catch (RequestException $e) {
+
+            $this->logger->error('Could not import the Bynder derivative.', [
+                'exception' => $e,
+                'contao' => new ContaoContext(__METHOD__)
+            ]);
+
+            return false;
+        }
+
+        // Only allow jpeg and png
+        switch ($contentType = $result->getHeader('Content-Type')[0]) {
+            case 'image/jpeg':
+                $extension = 'jpg';
+                break;
+            case 'image/png':
+                $extension = 'png';
+                break;
+            default:
+                $this->logger->error('Could not import the Bynder derivative because the content type did not match. Got ' . $contentType, [
+                    'content-type' => $contentType,
+                    'contao' => new ContaoContext(__METHOD__)
+                ]);
+
+                return false;
+        }
 
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
         $promise = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
-
         $media = $promise->wait();
 
-        $client = new Client();
-        $result = $client->request('GET', $media['thumbnails']['webimage']);
         $content = $result->getBody()->getContents();
 
         // Dump the contents
+        $absoluteTargetPath = $this->getTargetPathForMediaId($mediaId, $extension);
         $this->filesystem->dumpFile($absoluteTargetPath, $content);
         $relativePath = $this->getUploadPathRelativePath($absoluteTargetPath);
 
@@ -97,7 +147,7 @@ class ImageHandler
 
         // Add bynder attributes
         $model->bynder_id = $mediaId;
-        $model->bynder_hash = $mediaHash;
+        $model->bynder_hash = $media['idHash'];
         $model->save();
 
         return StringUtil::binToUuid($model->uuid);
@@ -115,17 +165,12 @@ class ImageHandler
 
     /**
      * @param string $mediaId
+     * @param string $extension
      *
      * @return string
      */
-    private function getTargetPathForMediaId($mediaId)
+    private function getTargetPathForMediaId($mediaId, $extension)
     {
-        $promise = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
-
-        $info = $promise->wait();
-
-        $extension = $info['extension'][0];
-
         return $this->getAbsoluteProjectDir()
             . DIRECTORY_SEPARATOR
             . $this->uploadPath

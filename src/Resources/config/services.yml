@@ -17,7 +17,11 @@ services:
         class: Terminal42\ContaoBynder\ImageHandler
         arguments:
             - "@terminal42.contao_bynder.api"
-            - "@contao.framework"
-            - '%kernel.root_dir%'
-            - '%contao.upload_path%'
+            - "@logger"
+            - 'derivative_name' # Set based on configuration in extension
             - 'target_dir' # Set based on configuration in extension
+            - "@contao.framework"
+            - '%kernel.root_dir%/'
+            - '%contao.upload_path%'
+        tags:
+            - { name: monolog.logger, channel: terminal42.contao_bynder }

@@ -53,8 +53,15 @@ class ApiController extends Controller
     {
         $api = $this->get('terminal42.contao_bynder.api');
 
+        $queryString = Request::normalizeQueryString(
+            http_build_query(array_merge($request->query->all(), [
+                'limit' => 25,
+                //'isPublic' => 1, // only public images can be retrieved through derivatives
+            ]), null, '&')
+        );
+
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
-        $promise = $api->getAssetBankManager()->getMediaList($request->getQueryString());
+        $promise = $api->getAssetBankManager()->getMediaList($queryString);
 
         $media = $promise->wait();
 
@@ -78,19 +85,23 @@ class ApiController extends Controller
     {
         /** @var ImageHandler $imageHandler */
         $imageHandler = $this->get('terminal42.contao_bynder.image_handler');
-        $mediaId = $request->query->get('mediaId');
-        $mediaHash = $request->query->get('mediaHash');
 
-        $clean = function ($v) {
-            return preg_replace('/[^a-zA-Z\d-]/', '', $v);
-        };
+        $mediaId = preg_replace('/[^a-zA-Z\d-]/', '', $request->query->get('mediaId'));
 
-        $mediaId = $clean($mediaId);
-        $mediaHash = $clean($mediaHash);
+        $response = [
+            'status' => 'OK',
+            'uuid' => null,
+        ];
 
-        $uuid = $imageHandler->importImage($mediaId, $mediaHash);
+        $result = $imageHandler->importImage($mediaId);
 
-        return new JsonResponse(['uuid' => $uuid]);
+        if (false === $result) {
+            $response['status'] = 'FAILED';
+        } else {
+            $response['uuid'] = $result;
+        }
+
+        return new JsonResponse($response);
     }
 
     /**

@@ -47,8 +47,9 @@ class Terminal42ContaoBynderExtension extends Extension
         $api = $container->findDefinition('terminal42.contao_bynder.api');
         $api->setArgument(0, $settings);
 
-        // Configure target dir on image handler
+        // Configure image handler
         $imageHandler = $container->findDefinition('terminal42.contao_bynder.image_handler');
-        $imageHandler->setArgument(4, $config['targetDir']);
+        $imageHandler->setArgument(2, $config['derivativeName']);
+        $imageHandler->setArgument(3, $config['targetDir']);
     }
 }
