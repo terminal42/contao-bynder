@@ -56,7 +56,7 @@ class ApiController extends Controller
         $queryString = Request::normalizeQueryString(
             http_build_query(array_merge($request->query->all(), [
                 'limit' => 25,
-                //'isPublic' => 1, // only public images can be retrieved through derivatives
+                'isPublic' => 1, // only public images can be retrieved through derivatives
             ]), null, '&')
         );
 

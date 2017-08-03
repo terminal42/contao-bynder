@@ -63,6 +63,10 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                     ->isRequired()
                 ->end()
+                ->variableNode('derivativeOptions')
+                    ->info('The derivativeOptions contains an array of parameters (key -> value) that are added to the derivative URL when fetching the derivative. Note that this only works for on-the-fly derivatives.')
+                    ->treatNullLike([])
+                ->end()
             ->end()
         ;
 

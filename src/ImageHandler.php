@@ -37,6 +37,11 @@ class ImageHandler
     private $derivativeName;
 
     /**
+     * @var array
+     */
+    private $derivativeOptions;
+
+    /**
      * @var string
      */
     private $targetDir;
@@ -67,16 +72,18 @@ class ImageHandler
      * @param Api                      $api
      * @param LoggerInterface          $logger
      * @param                          $derivativeName
+     * @param array                    $derivativeOptions
      * @param                          $targetDir
      * @param ContaoFrameworkInterface $contaoFramework
      * @param                          $rootDir
      * @param string                   $uploadPath
      */
-    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, $targetDir, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath)
+    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, array $derivativeOptions = [], $targetDir, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath)
     {
         $this->api = $api;
         $this->logger = $logger;
         $this->derivativeName = $derivativeName;
+        $this->derivativeOptions = $derivativeOptions;
         $this->targetDir = trim($targetDir, '/');
         $this->contaoFramework = $contaoFramework;
         $this->rootDir = $rootDir;
@@ -95,6 +102,22 @@ class ImageHandler
             $mediaId,
             $this->derivativeName
         );
+
+        if (0 !== count($this->derivativeOptions)) {
+
+            // Force booleans to be passed as booleans (http_build_query() converts false to 0)
+            $options = $this->derivativeOptions;
+            array_walk($options, function(&$v) {
+                if (true === $v) {
+                    $v = 'true';
+                }
+                if (false === $v) {
+                    $v = 'false';
+                }
+            });
+
+            $uri .= '?' . http_build_query($options, null, '&');
+        }
 
         try {
             $client = new Client();

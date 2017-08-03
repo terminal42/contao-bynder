@@ -18,8 +18,9 @@ services:
         arguments:
             - "@terminal42.contao_bynder.api"
             - "@logger"
-            - 'derivative_name' # Set based on configuration in extension
-            - 'target_dir' # Set based on configuration in extension
+            - 'derivativeName' # Set based on configuration in extension
+            - 'derivativeOptions' # Set based on configuration in extension
+            - 'targetDir' # Set based on configuration in extension
             - "@contao.framework"
             - '%kernel.root_dir%/'
             - '%contao.upload_path%'
