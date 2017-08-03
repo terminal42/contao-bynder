@@ -2,10 +2,9 @@
     <div>
         <thumbnail :name="image.name" :meta="image.meta" :thumb="image.thumb"></thumbnail>
         <div class="tl_right download-button">
-            <div v-if="!image.downloaded" :class="{ 'button': true, 'ld': true, 'ld-over-inverse': true, running: this.isDownloading }" @click="downloadImage()">
-                <div class="ld ld-ring l-spin"></div>
-                <div></div>
+            <div v-if="!image.downloaded" :class="{ 'button': true, 'ld-over-inverse': true, running: this.isDownloading }" @click="downloadImage()">
                 <img src="bundles/terminal42contaobynder/download.svg" width="20">
+                <div class="ld ld-ring ld-cycle"></div>
             </div>
             <radio v-if="mode == 'radio'" name="picker" :value="image.uuid" :checked="image.selected" :disabled="!image.downloaded"></radio>
             <checkbox v-else name="picker[]" :value="image.uuid" :checked="image.selected" :disabled="!image.downloaded"></checkbox>
