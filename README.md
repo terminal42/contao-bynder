@@ -70,6 +70,7 @@ terminal42_contao_bynder:
     token: 'foobar'
     tokenSecret: 'foobar'
     targetDir: 'bynder_assets' # The target dir the bundle downloads assets to. Make sure it is RELATIVE to your specified contao.upload_path (In that case it would be default store the images in /files/bynder_assets)
+    derivativeName: foobar_derivative # See documentation of Bynder settings
     derivativeOptions: # See documentation of Bynder settings
         w: 3000
         h: 3000
@@ -84,7 +85,18 @@ such as a 750 MB TIFF image. However, Bynder knows the concept of "derivatives".
 Derivatives are variations of the original image. They allow you to create e.g.
 a 3000 x 3000 pixel JPEG file from your 750 MB TIFF file. You can ask Bynder to
 create them every time a user uploads a file or you can create so called on-the-fly
-derivatives. 
+derivatives.
+
+Note that derivatives can only be created for public assets.
+This is also the reason why **all images that you want to include need to be public!**
+
+You have to tell the bundle which derivative it shall take by passing the name to
+the configuration as follows:
+
+```yaml
+derivativeName: foobar_derivative
+```
+
 On-the-fly derivatives even allow any third party application to override the desired
 parameters. Go and have a look at the "Supported parameters" section in the [Bynder
 knowledge base][1] to see how you can override these.
@@ -104,7 +116,6 @@ proportions which is usually what you want to have. You **absolutely do not need
 to pass this configuration. You can also create a derivative only for this integration
 and name it e.g. "contao_bynder_integration" and configure the settings already there.
 
-Note that derivatives can only be created for public assets.
-This is also the reason why **all images that you want to include need to be public!**
+
 
 [1]: https://help.bynder.com/Modules/Asset-Bank/Modify-public-derivatives-on-the-fly.htm
