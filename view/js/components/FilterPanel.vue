@@ -29,7 +29,7 @@
 
     export default {
         props: {
-            mediaproperties: {
+            metaproperties: {
                 type: Object,
                 required: true,
             },
@@ -50,8 +50,8 @@
             filters() {
                 let filters = {};
 
-                Object.keys(this.mediaproperties).forEach((property) => {
-                   let filterDef = this.mediaproperties[property];
+                Object.keys(this.metaproperties).forEach((property) => {
+                   let filterDef = this.metaproperties[property];
                    // Currently, only single selects are supported.
                    if ('select' === filterDef.type && 0 === filterDef.isMultiselect) {
                        filters[property] = [];
@@ -67,9 +67,15 @@
                        });
 
                        filterDef.options.forEach((option) => {
+
+                           // No need to show empty filter options
+                           if (0 === option.mediaCount) {
+                               return;
+                           }
+
                            filters[property].push({
                                label: option.displayLabel, // TODO maybe use "labels"?
-                               value: option.id
+                               value: option.id,
                            })
                        });
 

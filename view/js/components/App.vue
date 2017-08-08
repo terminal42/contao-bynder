@@ -1,6 +1,6 @@
 <template>
     <div id="bynder-asset-mgmt">
-        <div class="tl_panel cf"><filter-panel :mediaproperties="mediaproperties" :labels="labels" @apply="applyFilter" @reset="resetFilter"></filter-panel></div>
+        <div class="tl_panel cf"><filter-panel :metaproperties="metaproperties" :labels="labels" @apply="applyFilter" @reset="resetFilter"></filter-panel></div>
         <div class="tl_listing_container tree_view" id="tl_listing">
             <div v-if="loading" class="loader">{{ labels.loadingData }}</div>
             <div v-else-if="!hasImages()">{{ labels.noResult }}</div>
@@ -33,7 +33,7 @@
 
         data() {
             return {
-                mediaproperties: {},
+                metaproperties: {},
                 images: [],
                 loading: false,
             }
@@ -41,9 +41,9 @@
 
         created() {
 
-            this.$http.get('/_bynder_api/mediaproperties').then(
+            this.$http.get('/_bynder_api/metaproperties').then(
                 (data) => {
-                    this.mediaproperties = data.body;
+                    this.metaproperties = data.body;
                 }
             );
 

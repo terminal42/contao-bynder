@@ -28,14 +28,14 @@ class ApiController extends Controller
      *
      * @return Response
      *
-     * @Route("/_bynder_api/mediaproperties", name="bynder_api_mediaproperties")
+     * @Route("/_bynder_api/metaproperties", name="bynder_api_metaproperties")
      */
     public function mediapropertiesAction(Request $request)
     {
         $api = $this->get('terminal42.contao_bynder.api');
 
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
-        $promise = $api->getAssetBankManager()->getMetaproperties();
+        $promise = $api->getAssetBankManager()->getMetaproperties('type=image&count=1');
 
         $properties = $promise->wait();
 
