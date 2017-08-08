@@ -58,6 +58,7 @@ class ApiController extends Controller
                 'limit' => 25,
                 'type' => 'image', // Maybe one day we'll support other stuff?
                 'isPublic' => 1, // only public images can be retrieved through derivatives
+                'orderBy' => 'name asc',
             ]), null, '&')
         );
 
