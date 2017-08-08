@@ -98,6 +98,10 @@ class ImageHandler
      */
     public function importImage($mediaId)
     {
+        /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
+        $promise = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
+        $media = $promise->wait();
+
         $uri = sprintf('images/media/%s/derivatives/%s/',
             $mediaId,
             $this->derivativeName
@@ -152,10 +156,6 @@ class ImageHandler
 
                 return false;
         }
-
-        /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
-        $promise = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
-        $media = $promise->wait();
 
         $content = $result->getBody()->getContents();
 
