@@ -160,7 +160,7 @@ class ImageHandler
         $content = $result->getBody()->getContents();
 
         // Dump the contents
-        $absoluteTargetPath = $this->getTargetPathForMediaId($mediaId, $extension);
+        $absoluteTargetPath = $this->getTargetPathForMediaId($media['name'], $extension);
         $this->filesystem->dumpFile($absoluteTargetPath, $content);
         $relativePath = $this->getUploadPathRelativePath($absoluteTargetPath);
 
@@ -187,20 +187,29 @@ class ImageHandler
     }
 
     /**
-     * @param string $mediaId
+     * @param string $name
      * @param string $extension
      *
      * @return string
      */
-    private function getTargetPathForMediaId($mediaId, $extension)
+    private function getTargetPathForMediaId($name, $extension)
     {
+        $subfolder = '';
+
+        if (strlen($name) >= 2) {
+            $subfolder = strtolower($name[0])
+                . strtolower($name[1])
+                . DIRECTORY_SEPARATOR;
+        }
+
         return $this->getAbsoluteProjectDir()
             . DIRECTORY_SEPARATOR
             . $this->uploadPath
             . DIRECTORY_SEPARATOR
             . $this->targetDir
             . DIRECTORY_SEPARATOR
-            . $mediaId
+            . $subfolder
+            . $name
             . '.'
             . $extension;
     }
