@@ -25,6 +25,7 @@ Because of this, there is still a lot of things we could do that is not done yet
 - [ ] Support filters other than `select`
 - [ ] Find a way how one can control which filters are shown and which ones are not
 - [ ] Support the picker wizard in Contao, not only the FileTree widget
+- [ ] Support other assets, not only `image`
 - [ ] More?
 
 ## Installation
