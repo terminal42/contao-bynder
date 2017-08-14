@@ -16,6 +16,10 @@ use Contao\Dbafs;
 use Contao\StringUtil;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -124,7 +128,34 @@ class ImageHandler
         }
 
         try {
-            $client = new Client();
+            $stack = HandlerStack::create();
+            $stack->push(Middleware::retry(function (
+                $retries,
+                Request $request,
+                Response $response = null,
+                RequestException $exception = null
+            ) {
+                if ($retries >= 5) {
+                    return false;
+                }
+
+                if (202 === $response->getStatusCode()) {
+                    return true;
+                }
+
+                return false;
+            }, function($retries) {
+                if ($retries >= 5) {
+                    return 0;
+                }
+
+                return 4000; // 4 seconds
+            }));
+
+            $client = new Client([
+                'handler' => $stack,
+            ]);
+
             $result = $client->request('GET', $uri, [
                 'base_uri' => $this->api->getBaseUrl(),
                 'allow_redirects' => true,
