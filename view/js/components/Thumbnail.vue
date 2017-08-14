@@ -1,27 +1,20 @@
 <template>
-    <div class="tl_left" style="padding-left:40px"> {{ name }} <span class="tl_gray">{{ meta }}</span><br>
+    <div class="tl_left" style="padding-left:40px"> {{ image.name }} <span class="tl_gray">{{ image.meta }}</span><br>
         <img
-                :src="thumb.src"
-                :width="thumb.width"
-                :height="thumb.height"
-                :alt="thumb.alt"
+                :src="image.thumb.src"
+                :width="image.thumb.width"
+                :height="image.thumb.height"
+                :alt="image.thumb.alt"
                 style="margin:5px 0 2px -19px"
         >
+        <div><span class="tl_gray">Media ID: {{ image.bynder_id }}</span></div>
     </div>
 </template>
 
 <script>
     export default {
         props: {
-            name: {
-                type: String,
-                required: true,
-            },
-            meta: {
-                type: String,
-                required: true,
-            },
-            thumb: {
+            image: {
                 type: Object,
                 required: true,
             },

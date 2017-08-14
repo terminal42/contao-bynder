@@ -1,6 +1,6 @@
 <template>
     <div>
-        <thumbnail :name="image.name" :meta="image.meta" :thumb="image.thumb"></thumbnail>
+        <thumbnail :image="image"></thumbnail>
         <div class="tl_right download-button">
             <div v-if="!image.downloaded" :class="{ 'button': true, 'ld-over-inverse': true, running: this.isDownloading }" @click="downloadImage()">
                 <img src="bundles/terminal42contaobynder/download.svg" width="20">
