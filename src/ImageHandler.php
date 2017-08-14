@@ -10,6 +10,7 @@
 namespace Terminal42\ContaoBynder;
 
 use Bynder\Api\IBynderApi;
+use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Dbafs;
@@ -191,6 +192,7 @@ class ImageHandler
         $content = $result->getBody()->getContents();
 
         // Dump the contents
+        $this->ensureTargetDirIsPublic();
         $absoluteTargetPath = $this->getTargetPathForMediaId($media['name'], $extension);
         $this->filesystem->dumpFile($absoluteTargetPath, $content);
         $relativePath = $this->getUploadPathRelativePath($absoluteTargetPath);
@@ -233,11 +235,7 @@ class ImageHandler
                 . DIRECTORY_SEPARATOR;
         }
 
-        return $this->getAbsoluteProjectDir()
-            . DIRECTORY_SEPARATOR
-            . $this->uploadPath
-            . DIRECTORY_SEPARATOR
-            . $this->targetDir
+        return $this->getAbsoluteTargetDir()
             . DIRECTORY_SEPARATOR
             . $subfolder
             . $name
@@ -255,5 +253,36 @@ class ImageHandler
             . '..'
             . DIRECTORY_SEPARATOR
         );
+    }
+
+    /**
+     * @return string
+     */
+    private function getAbsoluteTargetDir()
+    {
+        return $this->getAbsoluteProjectDir()
+            . DIRECTORY_SEPARATOR
+            . $this->uploadPath
+            . DIRECTORY_SEPARATOR
+            . $this->targetDir
+            ;
+    }
+
+    /**
+     * Ensure the target dir is public and symlinked.
+     */
+    private function ensureTargetDirIsPublic()
+    {
+        $file = $this->getAbsoluteTargetDir()
+            . DIRECTORY_SEPARATOR
+            . '.public';
+
+        if (!file_exists($file)) {
+            $fs = new Filesystem();
+            $fs->dumpFile($file, '');
+
+            $automator = new Automator();
+            $automator->generateSymlinks();
+        }
     }
 }
