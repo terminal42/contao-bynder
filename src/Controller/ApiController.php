@@ -57,7 +57,6 @@ class ApiController extends Controller
             http_build_query(array_merge($request->query->all(), [
                 'limit' => 25,
                 'type' => 'image', // Maybe one day we'll support other stuff?
-                'isPublic' => 1, // only public images can be retrieved through derivatives
                 'orderBy' => 'name asc',
             ]), null, '&')
         );

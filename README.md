@@ -90,9 +90,6 @@ a 3000 x 3000 pixel JPEG file from your 750 MB TIFF file. You can ask Bynder to
 create them every time a user uploads a file or you can create so called on-the-fly
 derivatives.
 
-Note that derivatives can only be created for public assets.
-This is also the reason why **all images that you want to include need to be public!**
-
 You have to tell the bundle which derivative it shall take by passing the name to
 the configuration as follows:
 
