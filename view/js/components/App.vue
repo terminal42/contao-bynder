@@ -45,6 +45,7 @@
                 pagination: {},
                 images: [],
                 loading: false,
+                lastQueryString: '',
                 imageQuery: {
                     filters: {},
                     keywords: '',
@@ -87,7 +88,6 @@
             },
 
             updateImages() {
-
                 if (this.loading) {
                     return;
                 }
@@ -96,7 +96,7 @@
                     this.pagination.currentPage = 1;
                 }
 
-                let queryString =  {page: this.pagination.currentPage };
+                let queryString =  { page: this.pagination.currentPage };
                 let optionIds = [];
 
                 if ('' !== this.imageQuery.keywords) {
@@ -116,7 +116,13 @@
                 }
 
                 queryString = this.buildQueryString(queryString);
+
+                if (this.lastQueryString === queryString) {
+                    return;
+                }
+
                 this.loading = true;
+                this.lastQueryString = queryString;
 
                 let uri = '/_bynder_api/images' + (('' !== queryString) ? ('?' + queryString) : '');
 
@@ -131,8 +137,7 @@
                 });
             },
 
-            paginationUpdated(page) {
-                this.pagination.currentPage = page;
+            paginationUpdated() {
                 this.updateImages();
             },
 

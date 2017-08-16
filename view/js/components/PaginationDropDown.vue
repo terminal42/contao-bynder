@@ -1,7 +1,7 @@
 <template>
     <div class="tl_limit tl_subpanel">
         <strong>{{ labels.showOnly }}:</strong>
-        <select v-model="currentPage" name="tl_limit" :class="{'tl_select': true, 'active': data.currentPage !== 1 }" @change="apply()">
+        <select v-model="data.currentPage" name="tl_limit" :class="{'tl_select': true, 'active': data.currentPage !== 1 }" @change="apply()">
             <option v-for="option in getOptions()" :value="option.value">{{ option.label }}</option>
         </select>
     </div>
@@ -21,20 +21,10 @@
             },
         },
 
-        data() {
-            return {
-                currentPage: 1,
-            }
-        },
-
         methods: {
 
             apply() {
-                if (this.data.currentPage === this.currentPage) {
-                    return;
-                }
-
-                this.$emit('apply', this.currentPage);
+                this.$emit('apply');
             },
 
             getOptions() {
