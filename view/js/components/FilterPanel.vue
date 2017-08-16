@@ -1,6 +1,6 @@
 <template>
     <form method="post" @submit.prevent="applyFilters()">
-    <div class="tl_panel cf">
+        <div class="tl_panel cf">
             <div class="tl_search tl_subpanel">
                 <strong>{{ labels.search }}:</strong>
                 <select name="tl_field" :class="{ tl_select: true, active: keywords !== '' }">
@@ -11,9 +11,6 @@
             </div>
         </div>
         <div v-if="hasFilters()" class="tl_panel cf">
-            <div class="tl_submit_panel tl_subpanel">
-                <button name="filter_reset" id="filter_reset" value="1" class="tl_img_submit filter_reset" title="" @click="resetFilters">{{ labels.reset }}</button>
-            </div>
             <div class="tl_filter tl_subpanel">
                 <strong>{{ labels.filter }}:</strong>
                 <select v-model="filterData[property]" v-for="(options, property) in filters" :name="property" :class="{ tl_select: true, active: isFilterActive(property)}" @change="applyFilters()">
@@ -21,11 +18,18 @@
                 </select>
             </div>
         </div>
+        <div class="tl_panel cf">
+            <div class="tl_submit_panel tl_subpanel" style="min-width:0">
+                <button name="filter_reset" id="filter_reset" value="1" class="tl_img_submit filter_reset" title="" @click="resetFilters">{{ labels.reset }}</button>
+            </div>
+            <pagination-drop-down :data="pagination" :labels="labels" @apply="updatePagination"></pagination-drop-down>
+        </div>
     </form>
 </template>
 
 <script>
     import debounce from 'lodash.debounce';
+    import PaginationDropDown from './PaginationDropDown.vue';
 
     export default {
         props: {
@@ -36,8 +40,14 @@
             labels: {
                 type: Object,
                 required: true,
-            }
+            },
+            pagination: {
+                type: Object,
+                required: true,
+            },
         },
+
+        components: { PaginationDropDown },
 
         data() {
             return {
@@ -132,6 +142,10 @@
                 this.keywords = '';
 
                 this.$emit('reset');
+            },
+
+            updatePagination(page) {
+                this.$emit('paginationUpdated', page);
             }
         },
     };

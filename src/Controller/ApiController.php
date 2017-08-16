@@ -52,19 +52,24 @@ class ApiController extends Controller
     public function imagesAction(Request $request)
     {
         $api = $this->get('terminal42.contao_bynder.api');
+        $limit = 25;
+        $page = $request->query->getInt('page', 1);
 
         $queryString = Request::normalizeQueryString(
             http_build_query(array_merge($request->query->all(), [
-                'limit' => 25,
+                'limit' => $limit,
                 'type' => 'image', // Maybe one day we'll support other stuff?
                 'orderBy' => 'name asc',
+                'count' => 1,
+                'page' => $page,
             ]), null, '&')
         );
 
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
         $promise = $api->getAssetBankManager()->getMediaList($queryString);
 
-        $media = $promise->wait();
+        $result = $promise->wait();
+        $media = $result['media'];
 
         $images = [];
         $downloaded = $this->fetchDownloaded($media);
@@ -72,7 +77,10 @@ class ApiController extends Controller
             $images[] = $this->prepareImage($imageData, $downloaded);
         }
 
-        return new JsonResponse($images);
+        return new JsonResponse([
+            'images' => $images,
+            'pagination' => $this->calculatePagination($page, $limit, (int) $result['count']['total']),
+        ]);
     }
 
     /**
@@ -189,5 +197,36 @@ class ApiController extends Controller
         }
 
         return $downloaded;
+    }
+
+    /**
+     * @param int $page
+     * @param int $limit
+     * @param int $total
+     *
+     * @return array
+     */
+    private function calculatePagination($page, $limit, $total)
+    {
+        $totalPages = ceil($total / $limit);
+        $hasPrevious = $page > 1;
+        $hasNext = $page < $totalPages;
+        $previous = max(1, $page - 1);
+        $next = $page + 1;
+
+        if ($next > $totalPages) {
+            $next = $totalPages;
+        }
+
+        return [
+            'totalImages' => $total,
+            'totalPages' => $totalPages,
+            'perPage' => $limit,
+            'currentPage' => $page,
+            'hasPrevious' => $hasPrevious,
+            'hasNext' => $hasNext,
+            'previous' => $previous,
+            'next' => $next,
+        ];
     }
 }

@@ -102,6 +102,7 @@ class PickerController extends Controller
             'keywords' => $GLOBALS['TL_LANG']['MSC']['keywords'],
             'loadingData' => $GLOBALS['TL_LANG']['MSC']['loadingData'],
             'noResult' => $GLOBALS['TL_LANG']['MSC']['noResult'],
+            'showOnly' => $GLOBALS['TL_LANG']['MSC']['showOnly'],
         ]);
 
         return <<<VIEW

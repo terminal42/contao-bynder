@@ -1,6 +1,13 @@
 <template>
     <div id="bynder-asset-mgmt">
-        <div class="tl_panel cf"><filter-panel :metaproperties="metaproperties" :labels="labels" @apply="applyFilter" @reset="resetFilter"></filter-panel></div>
+        <filter-panel
+                :metaproperties="metaproperties"
+                :labels="labels"
+                :pagination="pagination"
+                @apply="applyFilter"
+                @reset="resetFilter"
+                @paginationUpdated="paginationUpdated">
+        </filter-panel>
         <div class="tl_listing_container tree_view" id="tl_listing">
             <div v-if="loading" class="loader">{{ labels.loadingData }}</div>
             <div v-else-if="!hasImages()">{{ labels.noResult }}</div>
@@ -17,6 +24,7 @@
 <script>
     import FilterPanel from './FilterPanel.vue';
     import ImageRow from './ImageRow.vue';
+
     export default {
         props: {
             mode: {
@@ -34,6 +42,8 @@
         data() {
             return {
                 metaproperties: {},
+                pagination: {},
+                currentPage: 1,
                 images: [],
                 loading: false,
             }
@@ -88,6 +98,8 @@
 
                 queryString = queryString || {};
 
+                Object.assign(queryString, {page: this.currentPage});
+
                 queryString = this.buildQueryString(queryString);
                 this.loading = true;
 
@@ -95,12 +107,18 @@
 
                 this.$http.get(uri).then(
                     (data) => {
-                        this.images = data.body;
+                        this.images = data.body.images;
+                        this.pagination = data.body.pagination;
                         this.loading = false;
                     }
                 ).catch(() => {
                     this.loading = false;
                 });
+            },
+
+            paginationUpdated(page) {
+                this.currentPage = page;
+                this.updateImages();
             },
 
             buildQueryString(data) {
