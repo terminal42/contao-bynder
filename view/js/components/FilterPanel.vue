@@ -63,7 +63,7 @@
                 Object.keys(this.metaproperties).forEach((property) => {
                    let filterDef = this.metaproperties[property];
                    // Currently, only single selects are supported.
-                   if ('select' === filterDef.type && 0 === filterDef.isMultiselect) {
+                   if ('select' === filterDef.type || 'select2' === filterDef.type) {
                        filters[property] = [];
 
                        // Add label and reset options first
@@ -88,6 +88,14 @@
                                value: option.id,
                            })
                        });
+
+                       // If length is equal to 3 (label, reset plus 1 option only)
+                       // We do not show the filter either because filtering for
+                       // only one available option is not really helpful either,
+                       // is it?
+                       if (filters[property].length === 3) {
+                           delete filters[property];
+                       }
 
                        // Set default selected option
                        this.filterData[property] = '';
