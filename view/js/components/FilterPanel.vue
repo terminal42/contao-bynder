@@ -1,5 +1,5 @@
 <template>
-    <form method="post" @submit.prevent="applyFilters()">
+    <div>
         <div class="tl_panel cf">
             <div class="tl_search tl_subpanel">
                 <strong>{{ labels.search }}:</strong>
@@ -24,7 +24,7 @@
             </div>
             <pagination-drop-down :data="pagination" :labels="labels" @apply="updatePagination"></pagination-drop-down>
         </div>
-    </form>
+    </div>
 </template>
 
 <script>

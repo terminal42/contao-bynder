@@ -43,9 +43,12 @@
             return {
                 metaproperties: {},
                 pagination: {},
-                currentPage: 1,
                 images: [],
                 loading: false,
+                imageQuery: {
+                    filters: {},
+                    keywords: '',
+                }
             }
         },
 
@@ -68,15 +71,40 @@
 
             applyFilter(filters, keywords) {
 
-                let optionIds = [];
-                let queryString = {};
+                this.imageQuery.filters = filters;
+                this.imageQuery.keywords = keywords;
+                this.pagination.currentPage = 1;
 
-                if ('' !== keywords) {
-                    queryString['keyword'] = keywords;
+                this.updateImages();
+            },
+
+            resetFilter() {
+                this.imageQuery.filters = {};
+                this.imageQuery.keywords = '';
+                this.pagination.currentPage = 1;
+
+                this.updateImages();
+            },
+
+            updateImages() {
+
+                if (this.loading) {
+                    return;
                 }
 
-                Object.keys(filters).forEach((property) => {
-                    let optionId = filters[property];
+                if (undefined === this.pagination.currentPage) {
+                    this.pagination.currentPage = 1;
+                }
+
+                let queryString =  {page: this.pagination.currentPage };
+                let optionIds = [];
+
+                if ('' !== this.imageQuery.keywords) {
+                    queryString['keyword'] = this.imageQuery.keywords;
+                }
+
+                Object.keys(this.imageQuery.filters).forEach((property) => {
+                    let optionId = this.imageQuery.filters[property];
 
                     if ('' !== optionId) {
                         optionIds.push(optionId);
@@ -86,19 +114,6 @@
                 if (optionIds.length) {
                     queryString['propertyOptionId'] = optionIds.join(',');
                 }
-
-                this.updateImages(queryString);
-            },
-
-            resetFilter() {
-                this.updateImages();
-            },
-
-            updateImages(queryString) {
-
-                queryString = queryString || {};
-
-                Object.assign(queryString, {page: this.currentPage});
 
                 queryString = this.buildQueryString(queryString);
                 this.loading = true;
@@ -117,7 +132,7 @@
             },
 
             paginationUpdated(page) {
-                this.currentPage = page;
+                this.pagination.currentPage = page;
                 this.updateImages();
             },
 
