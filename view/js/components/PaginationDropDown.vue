@@ -30,6 +30,10 @@
         methods: {
 
             apply() {
+                if (this.data.currentPage === this.currentPage) {
+                    return;
+                }
+
                 this.$emit('apply', this.currentPage);
             },
 
