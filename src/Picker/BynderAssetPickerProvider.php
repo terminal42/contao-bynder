@@ -72,6 +72,17 @@ class BynderAssetPickerProvider implements PickerProviderInterface
     public function createMenuItem(PickerConfig $config)
     {
         $name = $this->getName();
+        $extensions = $config->getExtra('extensions');
+        $display = true;
+
+        if (null !== $extensions) {
+            $fieldConfig = explode(',', $extensions);
+            $valid = ['jpg', 'jpeg', 'png', 'gif'];
+
+            if (0 === count(array_intersect($valid, $fieldConfig))) {
+                $display = false;
+            }
+        }
 
         return $this->menuFactory->createItem(
             $name,
@@ -80,6 +91,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
                 'linkAttributes' => ['class' => $name],
                 'current' => $this->isCurrent($config),
                 'uri' => $this->generateUrl($config),
+                'display' => $display,
             ]
         );
     }
