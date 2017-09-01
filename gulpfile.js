@@ -12,6 +12,8 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const sass = require('gulp-sass');
 
+process.env.NODE_ENV = 'production';
+
 // ESLint
 gulp.task('lint', function () {
     return gulp.src(['view/js/app.js', '!node_modules/**'])
