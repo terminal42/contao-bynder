@@ -71,7 +71,7 @@ class PickerController extends Controller
             $template->pickerMenu = $this->get('contao.menu.renderer')->render($menu);
         }
 
-        $template->main = $this->getInitHtml($picker); // TODO implement
+        $template->main = $this->getInitHtml($picker);
         $template->title = 'Bynder Asset Management';
         $template->headline = 'Bynder Asset Management';
         $template->isPopup = true;
@@ -79,6 +79,8 @@ class PickerController extends Controller
         $template->base = Environment::get('base');
         $template->language = $GLOBALS['TL_LANGUAGE'];
         $template->charset = Config::get('characterSet');
+
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/terminal42contaobynder/app.min.js';
 
         return $template->getResponse();
     }
