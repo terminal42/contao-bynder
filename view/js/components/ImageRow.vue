@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <li class="tl_file click2edit toggle_select hover-div">
         <thumbnail :image="image"></thumbnail>
         <div class="tl_right download-button">
             <div v-if="!image.downloaded" :class="{ 'button': true, 'ld-over-inverse': true, running: this.isDownloading }" @click="downloadImage()">
@@ -9,8 +9,7 @@
             <radio v-if="mode == 'radio'" name="picker" :value="image.uuid" :checked="image.selected" :disabled="!image.downloaded"></radio>
             <checkbox v-else name="picker[]" :value="image.uuid" :checked="image.selected" :disabled="!image.downloaded"></checkbox>
         </div>
-        <div style="clear:both"></div>
-    </div>
+    </li>
 </template>
 
 <script>

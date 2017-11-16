@@ -15,13 +15,6 @@ even multiple Contao setups.
 
 ## Roadmap / Ideas
 
-**Warning:** This is an early - not even alpha - version of the bundle. We use it
-in a bigger project and it's still under active development and stuff might change
-over time. If you're interested in having a stable version of it very soon, consider
-getting in touch with us so we can find a solution for this.
-
-Because of this, there is still a lot of things we could do that is not done yet:
-
 - [ ] Support filters other than `select`
 - [ ] Find a way how one can control which filters are shown and which ones are not
 - [ ] Support the picker wizard in Contao, not only the FileTree widget
