@@ -13,9 +13,7 @@
             <div v-else-if="!hasImages()">{{ labels.noResult }}</div>
             <ul v-else class="tl_listing picker unselectable" id="tl_select">
                 <li class="tl_folder_top cf"><div class="tl_left"><img src="bundles/terminal42contaobynder/bynder-logo.svg" width="18" height="18" alt=""> Bynder Asset Management</div></li>
-                <li class="tl_file click2edit toggle_select hover-div" v-for="image in images">
-                    <image-row :image="image" :mode="mode"></image-row>
-                </li>
+                <image-row :image="image" :mode="mode" v-for="image in images"></image-row>
             </ul>
         </div>
     </div>
