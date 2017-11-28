@@ -54,6 +54,7 @@ class ApiController extends Controller
         $api = $this->get('terminal42.contao_bynder.api');
         $limit = 25;
         $page = $request->query->getInt('page', 1);
+        $preSelected = (array) explode(',', $request->query->get('preSelected'));
 
         $queryString = Request::normalizeQueryString(
             http_build_query(array_merge($request->query->all(), [
@@ -74,7 +75,7 @@ class ApiController extends Controller
         $images = [];
         $downloaded = $this->fetchDownloaded($media);
         foreach ($media as $imageData) {
-            $images[] = $this->prepareImage($imageData, $downloaded);
+            $images[] = $this->prepareImage($imageData, $downloaded, $preSelected);
         }
 
         return new JsonResponse([
@@ -115,10 +116,12 @@ class ApiController extends Controller
 
     /**
      * @param array $imageData
+     * @param array $downloaded
+     * @param array $preSelected
      *
      * @return array
      */
-    private function prepareImage(array $imageData, array $downloaded)
+    private function prepareImage(array $imageData, array $downloaded, array $preSelected)
     {
         $thumb = (object) [
             'src' => $imageData['thumbnails']['mini'],
@@ -131,7 +134,7 @@ class ApiController extends Controller
         $data = [
             'bynder_id' => $bynderId,
             'bynder_hash' => $bynderHash,
-            'selected' => false, // TODO
+            'selected' => false,
             'downloaded' => false,
             'name' => $imageData['name'],
             'meta' => sprintf('%s (%sx%s px)',
@@ -145,6 +148,9 @@ class ApiController extends Controller
         if (isset($downloaded[$bynderId])) {
             $data['downloaded'] = $downloaded[$bynderId]['bynder_hash'] === $bynderHash;
             $data['uuid'] = $downloaded[$bynderId]['uuid'];
+            if (in_array($data['uuid'], $preSelected, true)) {
+                $data['selected'] = true;
+            }
         }
 
         return $data;
