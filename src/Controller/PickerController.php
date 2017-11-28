@@ -95,6 +95,7 @@ class PickerController extends Controller
         $config = $picker->getConfig();
 
         $mode = $config->getExtra('fieldType');
+        $preSelected = json_encode((array) explode(',', $config->getValue()));
 
         $labels = json_encode((object) [
             'reset' => $GLOBALS['TL_LANG']['MSC']['reset'],
@@ -111,7 +112,7 @@ class PickerController extends Controller
 <div class="tl_tree_radio"></div>
 <div id="bynder_interface"></div>
 <script>
-window.initBynderInterface('#bynder_interface', {mode: '$mode', labels: $labels});
+window.initBynderInterface('#bynder_interface', {mode: '$mode', labels: $labels, preSelected: $preSelected});
 </script>
 VIEW;
     }

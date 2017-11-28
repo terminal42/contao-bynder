@@ -33,6 +33,10 @@
                 type: Object,
                 required: true,
             },
+            preSelected: {
+                type: Array,
+                required: true,
+            },
         },
 
         components: { FilterPanel, ImageRow },
@@ -94,7 +98,10 @@
                     this.pagination.currentPage = 1;
                 }
 
-                let queryString =  { page: this.pagination.currentPage };
+                let queryString =  {
+                    preSelected: this.preSelected.join(','),
+                    page: this.pagination.currentPage
+                };
                 let optionIds = [];
 
                 if ('' !== this.imageQuery.keywords) {
