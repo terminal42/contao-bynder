@@ -235,12 +235,28 @@ class ImageHandler
                 . DIRECTORY_SEPARATOR;
         }
 
-        return $this->getAbsoluteTargetDir()
+        $path = $this->getAbsoluteTargetDir()
             . DIRECTORY_SEPARATOR
             . $subfolder
             . $name
             . '.'
             . $extension;
+
+        // Check if already exists
+        $index = 1;
+        while ($this->filesystem->exists($path)) {
+            $path = $this->getAbsoluteTargetDir()
+                . DIRECTORY_SEPARATOR
+                . $subfolder
+                . $name
+                . '_' . $index
+                . '.'
+                . $extension;
+
+            $index++;
+        }
+
+        return $path;
     }
 
     /**
