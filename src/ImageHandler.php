@@ -229,9 +229,9 @@ class ImageHandler
     {
         $subfolder = '';
 
-        if (strlen($name) >= 2) {
-            $subfolder = strtolower($name[0])
-                . strtolower($name[1])
+        if (mb_strlen($name) >= 2) {
+            $subfolder = mb_strtolower(mb_substr($name, 0, 1))
+                . mb_strtolower(mb_substr($name, 1, 1))
                 . DIRECTORY_SEPARATOR;
         }
 
