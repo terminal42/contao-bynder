@@ -140,7 +140,7 @@ class ImageHandler
                     return false;
                 }
 
-                if (202 === $response->getStatusCode()) {
+                if ($response && 202 === $response->getStatusCode()) {
                     return true;
                 }
 
