@@ -9,12 +9,14 @@
 
 namespace Terminal42\ContaoBynder\Picker;
 
+use Contao\BackendUser;
 use Contao\CoreBundle\Picker\PickerConfig;
 use Contao\CoreBundle\Picker\PickerProviderInterface;
 use Contao\Validator;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 class BynderAssetPickerProvider implements PickerProviderInterface
 {
@@ -29,15 +31,22 @@ class BynderAssetPickerProvider implements PickerProviderInterface
     private $router;
 
     /**
+     * @var TokenStorage
+     */
+    private $tokenStorage;
+
+    /**
      * Constructor.
      *
      * @param FactoryInterface $menuFactory
      * @param RouterInterface  $router
+     * @param TokenStorage     $tokenStorage
      */
-    public function __construct(FactoryInterface $menuFactory, RouterInterface $router)
+    public function __construct(FactoryInterface $menuFactory, RouterInterface $router, TokenStorage $tokenStorage)
     {
         $this->menuFactory = $menuFactory;
         $this->router = $router;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -107,7 +116,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      */
     public function supportsContext($context)
     {
-        return 'file' === $context;
+        return 'file' === $context && !\in_array('1', $this->getUser()->bynder_disable, true);
     }
 
     /**
@@ -154,5 +163,33 @@ class BynderAssetPickerProvider implements PickerProviderInterface
         );
 
         return $this->router->generate('bynder_asset_picker', $params);
+    }
+
+    /**
+     * Returns the back end user object.
+     *
+     * @throws \RuntimeException
+     *
+     * @return BackendUser
+     */
+    private function getUser()
+    {
+        if (null === $this->tokenStorage) {
+            throw new \RuntimeException('No token storage provided');
+        }
+
+        $token = $this->tokenStorage->getToken();
+
+        if (null === $token) {
+            throw new \RuntimeException('No token provided');
+        }
+
+        $user = $token->getUser();
+
+        if (!$user instanceof BackendUser) {
+            throw new \RuntimeException('The token does not contain a back end user object');
+        }
+
+        return $user;
     }
 }
