@@ -7,10 +7,4 @@
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
-namespace Terminal42\ContaoBynder;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class Terminal42ContaoBynderBundle extends Bundle
-{
-}
+$GLOBALS['TL_LANG']['tl_user_group']['bynder_disable'] = ['Disable Bynder integration', 'Disables the Bynder integration for this user group.'];

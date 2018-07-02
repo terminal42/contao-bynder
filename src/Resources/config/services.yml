@@ -4,6 +4,7 @@ services:
         arguments:
             - "@knp_menu.factory"
             - "@router"
+            - "@security.token_storage"
         tags:
             - { name: contao.picker_provider }
 

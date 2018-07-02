@@ -3,7 +3,7 @@
 /*
  * Contao Bynder Bundle
  *
- * @copyright  Copyright (c) 2008-2017, terminal42 gmbh
+ * @copyright  Copyright (c) 2008-2018, terminal42 gmbh
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
@@ -83,7 +83,7 @@ class ImageHandler
      * @param                          $rootDir
      * @param string                   $uploadPath
      */
-    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, array $derivativeOptions = [], $targetDir, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath)
+    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, array $derivativeOptions, $targetDir, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath)
     {
         $this->api = $api;
         $this->logger = $logger;
@@ -99,7 +99,7 @@ class ImageHandler
     /**
      * @param string $mediaId
      *
-     * @return string|false The Contao file system UUID on success or false if something went wrong.
+     * @return string|false the Contao file system UUID on success or false if something went wrong
      */
     public function importImage($mediaId)
     {
@@ -113,10 +113,9 @@ class ImageHandler
         );
 
         if (0 !== count($this->derivativeOptions)) {
-
             // Force booleans to be passed as booleans (http_build_query() converts false to 0)
             $options = $this->derivativeOptions;
-            array_walk($options, function(&$v) {
+            array_walk($options, function (&$v) {
                 if (true === $v) {
                     $v = 'true';
                 }
@@ -145,7 +144,7 @@ class ImageHandler
                 }
 
                 return false;
-            }, function($retries) {
+            }, function ($retries) {
                 if ($retries >= 5) {
                     return 0;
                 }
@@ -163,10 +162,9 @@ class ImageHandler
                 'timeout' => 8,
             ]);
         } catch (RequestException $e) {
-
             $this->logger->error('Could not import the Bynder derivative.', [
                 'exception' => $e,
-                'contao' => new ContaoContext(__METHOD__)
+                'contao' => new ContaoContext(__METHOD__),
             ]);
 
             return false;
@@ -183,7 +181,7 @@ class ImageHandler
             default:
                 $this->logger->error('Could not import the Bynder derivative because the content type did not match. Got ' . $contentType, [
                     'content-type' => $contentType,
-                    'contao' => new ContaoContext(__METHOD__)
+                    'contao' => new ContaoContext(__METHOD__),
                 ]);
 
                 return false;
@@ -253,7 +251,7 @@ class ImageHandler
                 . '.'
                 . $extension;
 
-            $index++;
+            ++$index;
         }
 
         return $path;
