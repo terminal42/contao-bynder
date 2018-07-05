@@ -116,7 +116,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      */
     public function supportsContext($context)
     {
-        return 'file' === $context && !\in_array('1', $this->getUser()->bynder_disable, true);
+        return 'file' === $context && !\in_array('1', (array) $this->getUser()->bynder_disable, true);
     }
 
     /**
