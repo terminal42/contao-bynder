@@ -13,6 +13,7 @@ services:
         factory: ['Terminal42\ContaoBynder\Api', create]
         arguments:
             - 'settings' # Set based on configuration in extension
+        public: true
 
     terminal42.contao_bynder.image_handler:
         class: Terminal42\ContaoBynder\ImageHandler
@@ -27,3 +28,4 @@ services:
             - '%contao.upload_path%'
         tags:
             - { name: monolog.logger, channel: terminal42.contao_bynder }
+        public: true
