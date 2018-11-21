@@ -80,7 +80,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      */
     public function createMenuItem(PickerConfig $config)
     {
-        $GLOBALS['TL_CSS'][] = 'bundles/terminal42contaobynder/styles.min.css';
+        $GLOBALS['TL_CSS'][] = 'bundles/terminal42contaobynder/app.css';
 
         $name = $this->getName();
         $extensions = $config->getExtra('extensions');

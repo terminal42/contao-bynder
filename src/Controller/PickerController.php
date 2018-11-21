@@ -80,7 +80,7 @@ class PickerController extends Controller
         $template->language = $GLOBALS['TL_LANGUAGE'];
         $template->charset = Config::get('characterSet');
 
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/terminal42contaobynder/app.min.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/terminal42contaobynder/app.js';
 
         return $template->getResponse();
     }

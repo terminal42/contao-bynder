@@ -3,7 +3,7 @@
         <thumbnail :image="image"></thumbnail>
         <div class="tl_right download-button">
             <div v-if="!image.downloaded" :class="{ 'button': true, 'ld-over-inverse': true, running: this.isDownloading }" @click="downloadImage()">
-                <img src="bundles/terminal42contaobynder/download.svg" width="20">
+                <img src="../../img/download.svg" width="20">
                 <div class="ld ld-ring ld-cycle"></div>
             </div>
             <radio v-if="mode == 'radio'" name="picker" :value="image.uuid" :checked="image.selected" :disabled="!image.downloaded"></radio>
