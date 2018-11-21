@@ -2,9 +2,9 @@ import Vue from 'vue';
 import VueResource from 'vue-resource';
 import App from './components/App.vue';
 
-Vue.use(VueResource);
+require('../css/styles.scss');
 
-require('babel-polyfill');
+Vue.use(VueResource);
 
 window.initBynderInterface = function (ref, props) {
     /* eslint-disable no-new */

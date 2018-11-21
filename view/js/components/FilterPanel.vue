@@ -84,9 +84,14 @@
                            }
 
                            filters[property].push({
-                               label: option.displayLabel, // TODO maybe use "labels"?
+                               label: option.displayLabel,
                                value: option.id,
                            })
+                       });
+
+                       // Sort alphabetically
+                       filters[property].sort(function(a, b) {
+                           return a.label.toLowerCase() > b.label.toLowerCase();
                        });
 
                        // If length is equal to 3 (label, reset plus 1 option only)
