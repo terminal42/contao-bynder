@@ -13,7 +13,7 @@
         "php": ">=5.6.0 | ^7.0",
         "ext-mbstring": "*",
         "contao/core-bundle": "^4.4.8",
-        "bynder/bynder-php-sdk": "^1.0",
+        "bynder/bynder-php-sdk": "^1.0.9",
         "guzzlehttp/guzzle": "^6.3"
     },
     "require-dev": {
