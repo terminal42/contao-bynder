@@ -9,7 +9,7 @@ services:
             - { name: contao.picker_provider }
 
     terminal42.contao_bynder.api:
-        class: Bynder\Api\Impl\BynderApi
+        class: 'Terminal42\ContaoBynder\Api'
         factory: ['Terminal42\ContaoBynder\Api', create]
         arguments:
             - 'settings' # Set based on configuration in extension
