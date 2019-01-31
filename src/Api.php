@@ -10,8 +10,6 @@
 namespace Terminal42\ContaoBynder;
 
 use Bynder\Api\Impl\BynderApi;
-use Bynder\Api\Impl\Oauth\Credentials;
-use Bynder\Api\Impl\Oauth\OauthRequestHandler;
 
 /**
  * This is just here because the php-sdk of bynder does not allow you to access
