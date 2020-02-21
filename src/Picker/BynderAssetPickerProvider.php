@@ -16,7 +16,7 @@ use Contao\Validator;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BynderAssetPickerProvider implements PickerProviderInterface
 {
@@ -31,7 +31,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
     private $router;
 
     /**
-     * @var TokenStorage
+     * @var TokenStorageInterface
      */
     private $tokenStorage;
 
@@ -40,9 +40,9 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @param FactoryInterface $menuFactory
      * @param RouterInterface  $router
-     * @param TokenStorage     $tokenStorage
+     * @param TokenStorageInterface     $tokenStorage
      */
-    public function __construct(FactoryInterface $menuFactory, RouterInterface $router, TokenStorage $tokenStorage)
+    public function __construct(FactoryInterface $menuFactory, RouterInterface $router, TokenStorageInterface $tokenStorage)
     {
         $this->menuFactory = $menuFactory;
         $this->router = $router;
