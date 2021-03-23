@@ -26,6 +26,10 @@
                 type: Object,
                 required: true,
             },
+            labels: {
+                type: Object,
+                required: true,
+            },
         },
 
         components: { Thumbnail, Radio, Checkbox },
@@ -51,10 +55,14 @@
                         if ('OK' === data.body.status) {
                             this.image.uuid = data.body.uuid;
                             this.image.downloaded = true;
+                        } else {
+                            throw new Error(`Image download failed with status ${data.body.status}`);
                         }
                     }
                 ).catch(() => {
-                    // TODO
+                    alert(this.labels.downloadFailed);
+                }).finally(() => {
+                    this.isDownloading = false;
                 });
             }
         }
