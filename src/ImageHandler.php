@@ -12,7 +12,6 @@ namespace Terminal42\ContaoBynder;
 use Bynder\Api\IBynderApi;
 use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Dbafs;
 use Contao\StringUtil;
 use GuzzleHttp\Client;
@@ -164,7 +163,6 @@ class ImageHandler
         } catch (RequestException $e) {
             $this->logger->error('Could not import the Bynder derivative.', [
                 'exception' => $e,
-                'contao' => new ContaoContext(__METHOD__),
             ]);
 
             return false;
@@ -181,7 +179,6 @@ class ImageHandler
             default:
                 $this->logger->error('Could not import the Bynder derivative because the content type did not match. Got ' . $contentType, [
                     'content-type' => $contentType,
-                    'contao' => new ContaoContext(__METHOD__),
                 ]);
 
                 return false;
