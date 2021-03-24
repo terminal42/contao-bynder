@@ -10,9 +10,12 @@ services:
 
     terminal42.contao_bynder.api:
         class: 'Terminal42\ContaoBynder\Api'
-        factory: ['Terminal42\ContaoBynder\Api', create]
+        factory: ['Terminal42\ContaoBynder\Api', createLogged]
         arguments:
             - 'settings' # Set based on configuration in extension
+            - "@logger"
+        tags:
+            - { name: monolog.logger, channel: terminal42.contao_bynder }
         public: true
 
     terminal42.contao_bynder.image_handler:
