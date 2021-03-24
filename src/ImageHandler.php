@@ -20,6 +20,8 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -128,6 +130,7 @@ class ImageHandler
 
         try {
             $stack = HandlerStack::create();
+            $stack->push(Api::getLoggingMiddleware($this->logger));
             $stack->push(Middleware::retry(function (
                 $retries,
                 Request $request,
