@@ -106,6 +106,7 @@ class PickerController extends Controller
             'loadingData' => $GLOBALS['TL_LANG']['MSC']['loadingData'],
             'noResult' => $GLOBALS['TL_LANG']['MSC']['noResult'],
             'showOnly' => $GLOBALS['TL_LANG']['MSC']['showOnly'],
+            'downloadFailed' => $GLOBALS['TL_LANG']['MSC']['bynderDownloadFailed'],
         ]);
 
         return <<<VIEW

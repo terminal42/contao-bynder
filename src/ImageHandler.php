@@ -12,7 +12,6 @@ namespace Terminal42\ContaoBynder;
 use Bynder\Api\IBynderApi;
 use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Dbafs;
 use Contao\StringUtil;
 use GuzzleHttp\Client;
@@ -21,6 +20,8 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -129,6 +130,7 @@ class ImageHandler
 
         try {
             $stack = HandlerStack::create();
+            $stack->push(Api::getLoggingMiddleware($this->logger));
             $stack->push(Middleware::retry(function (
                 $retries,
                 Request $request,
@@ -164,7 +166,6 @@ class ImageHandler
         } catch (RequestException $e) {
             $this->logger->error('Could not import the Bynder derivative.', [
                 'exception' => $e,
-                'contao' => new ContaoContext(__METHOD__),
             ]);
 
             return false;
@@ -181,7 +182,6 @@ class ImageHandler
             default:
                 $this->logger->error('Could not import the Bynder derivative because the content type did not match. Got ' . $contentType, [
                     'content-type' => $contentType,
-                    'contao' => new ContaoContext(__METHOD__),
                 ]);
 
                 return false;
