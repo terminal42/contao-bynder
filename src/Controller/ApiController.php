@@ -3,7 +3,7 @@
 /*
  * Contao Bynder Bundle
  *
- * @copyright  Copyright (c) 2008-2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
@@ -24,8 +24,6 @@ use Terminal42\ContaoBynder\ImageHandler;
 class ApiController extends Controller
 {
     /**
-     * @param Request $request
-     *
      * @return Response
      *
      * @Route("/_bynder_api/metaproperties", name="bynder_api_metaproperties")
@@ -43,8 +41,6 @@ class ApiController extends Controller
     }
 
     /**
-     * @param Request $request
-     *
      * @return Response
      *
      * @Route("/_bynder_api/images", name="bynder_api_images")
@@ -85,8 +81,6 @@ class ApiController extends Controller
     }
 
     /**
-     * @param Request $request
-     *
      * @return Response
      *
      * @Route("/_bynder_api/download", name="bynder_api_download")
@@ -115,10 +109,6 @@ class ApiController extends Controller
     }
 
     /**
-     * @param array $imageData
-     * @param array $downloaded
-     * @param array $preSelected
-     *
      * @return array
      */
     private function prepareImage(array $imageData, array $downloaded, array $preSelected)
@@ -148,7 +138,7 @@ class ApiController extends Controller
         if (isset($downloaded[$bynderId])) {
             $data['downloaded'] = $downloaded[$bynderId]['bynder_hash'] === $bynderHash;
             $data['uuid'] = $downloaded[$bynderId]['uuid'];
-            if (in_array($data['uuid'], $preSelected, true)) {
+            if (\in_array($data['uuid'], $preSelected, true)) {
                 $data['selected'] = true;
             }
         }
@@ -175,8 +165,6 @@ class ApiController extends Controller
     }
 
     /**
-     * @param array $media
-     *
      * @return array
      */
     private function fetchDownloaded(array $media)
