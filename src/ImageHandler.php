@@ -13,6 +13,7 @@ use Bynder\Api\IBynderApi;
 use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Dbafs;
+use Contao\FilesModel;
 use Contao\StringUtil;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -191,10 +192,20 @@ class ImageHandler
 
         /** @var Dbafs $dbafs */
         $dbafs = $this->contaoFramework->getAdapter(Dbafs::class);
-        $model = $dbafs->addResource($relativePath);
 
-        // Add bynder attributes
-        $model->bynder_id = $mediaId;
+        // Test if the hash already exists
+        $filesModel = $this->contaoFramework->getAdapter(FilesModel::class)->findOneBy('bynder_id', $mediaId);
+
+        // We already have a file with this media ID but apparently it has changed (otherwise we shouldn't land here)
+        if (null !== $filesModel) {
+            $model = $dbafs->moveResource($filesModel->path, $relativePath);
+        } else {
+            // New addition
+            $model = $dbafs->addResource($relativePath);
+            $model->bynder_id = $mediaId;
+        }
+
+        // Update the Bynder hash
         $model->bynder_hash = $media['idHash'];
         $model->save();
 
