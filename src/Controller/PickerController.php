@@ -3,7 +3,7 @@
 /*
  * Contao Bynder Bundle
  *
- * @copyright  Copyright (c) 2008-2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
@@ -29,8 +29,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class PickerController extends Controller
 {
     /**
-     * @param Request $request
-     *
      * @return Response
      *
      * @Route("/_bynder_asset_picker", name="bynder_asset_picker")
@@ -86,8 +84,6 @@ class PickerController extends Controller
     }
 
     /**
-     * @param PickerInterface $picker
-     *
      * @return string
      */
     private function getInitHtml(PickerInterface $picker)

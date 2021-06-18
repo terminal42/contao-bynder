@@ -3,7 +3,7 @@
 /*
  * Contao Bynder Bundle
  *
- * @copyright  Copyright (c) 2008-2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
@@ -13,6 +13,7 @@ use Bynder\Api\IBynderApi;
 use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Dbafs;
+use Contao\FilesModel;
 use Contao\StringUtil;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -20,8 +21,6 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -75,14 +74,10 @@ class ImageHandler
     /**
      * ImageHandler constructor.
      *
-     * @param Api                      $api
-     * @param LoggerInterface          $logger
-     * @param                          $derivativeName
-     * @param array                    $derivativeOptions
-     * @param                          $targetDir
-     * @param ContaoFrameworkInterface $contaoFramework
-     * @param                          $rootDir
-     * @param string                   $uploadPath
+     * @param        $derivativeName
+     * @param        $targetDir
+     * @param        $rootDir
+     * @param string $uploadPath
      */
     public function __construct(Api $api, LoggerInterface $logger, $derivativeName, array $derivativeOptions, $targetDir, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath)
     {
@@ -113,7 +108,7 @@ class ImageHandler
             $this->derivativeName
         );
 
-        if (0 !== count($this->derivativeOptions)) {
+        if (0 !== \count($this->derivativeOptions)) {
             // Force booleans to be passed as booleans (http_build_query() converts false to 0)
             $options = $this->derivativeOptions;
             array_walk($options, function (&$v) {
@@ -197,10 +192,20 @@ class ImageHandler
 
         /** @var Dbafs $dbafs */
         $dbafs = $this->contaoFramework->getAdapter(Dbafs::class);
-        $model = $dbafs->addResource($relativePath);
 
-        // Add bynder attributes
-        $model->bynder_id = $mediaId;
+        // Test if the hash already exists
+        $filesModel = $this->contaoFramework->getAdapter(FilesModel::class)->findOneBy('bynder_id', $mediaId);
+
+        // We already have a file with this media ID but apparently it has changed (otherwise we shouldn't land here)
+        if (null !== $filesModel) {
+            $model = $dbafs->moveResource($filesModel->path, $relativePath);
+        } else {
+            // New addition
+            $model = $dbafs->addResource($relativePath);
+            $model->bynder_id = $mediaId;
+        }
+
+        // Update the Bynder hash
         $model->bynder_hash = $media['idHash'];
         $model->save();
 
@@ -230,11 +235,11 @@ class ImageHandler
         if (mb_strlen($name) >= 2) {
             $subfolder = mb_strtolower(mb_substr($name, 0, 1))
                 . mb_strtolower(mb_substr($name, 1, 1))
-                . DIRECTORY_SEPARATOR;
+                . \DIRECTORY_SEPARATOR;
         }
 
         $path = $this->getAbsoluteTargetDir()
-            . DIRECTORY_SEPARATOR
+            . \DIRECTORY_SEPARATOR
             . $subfolder
             . $name
             . '.'
@@ -244,7 +249,7 @@ class ImageHandler
         $index = 1;
         while ($this->filesystem->exists($path)) {
             $path = $this->getAbsoluteTargetDir()
-                . DIRECTORY_SEPARATOR
+                . \DIRECTORY_SEPARATOR
                 . $subfolder
                 . $name
                 . '_' . $index
@@ -263,9 +268,9 @@ class ImageHandler
     private function getAbsoluteProjectDir()
     {
         return realpath($this->rootDir
-            . DIRECTORY_SEPARATOR
+            . \DIRECTORY_SEPARATOR
             . '..'
-            . DIRECTORY_SEPARATOR
+            . \DIRECTORY_SEPARATOR
         );
     }
 
@@ -275,9 +280,9 @@ class ImageHandler
     private function getAbsoluteTargetDir()
     {
         return $this->getAbsoluteProjectDir()
-            . DIRECTORY_SEPARATOR
+            . \DIRECTORY_SEPARATOR
             . $this->uploadPath
-            . DIRECTORY_SEPARATOR
+            . \DIRECTORY_SEPARATOR
             . $this->targetDir
             ;
     }
@@ -288,7 +293,7 @@ class ImageHandler
     private function ensureTargetDirIsPublic()
     {
         $file = $this->getAbsoluteTargetDir()
-            . DIRECTORY_SEPARATOR
+            . \DIRECTORY_SEPARATOR
             . '.public';
 
         if (!file_exists($file)) {

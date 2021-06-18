@@ -3,7 +3,7 @@
 /*
  * Contao Bynder Bundle
  *
- * @copyright  Copyright (c) 2008-2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
@@ -37,10 +37,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Constructor.
-     *
-     * @param FactoryInterface $menuFactory
-     * @param RouterInterface  $router
-     * @param TokenStorageInterface     $tokenStorage
      */
     public function __construct(FactoryInterface $menuFactory, RouterInterface $router, TokenStorageInterface $tokenStorage)
     {
@@ -62,8 +58,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
     /**
      * Returns the URL to the picker based on the current value.
      *
-     * @param PickerConfig $config
-     *
      * @return string
      */
     public function getUrl(PickerConfig $config)
@@ -73,8 +67,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Creates the menu item for this picker.
-     *
-     * @param PickerConfig $config
      *
      * @return ItemInterface
      */
@@ -90,7 +82,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
             $fieldConfig = explode(',', $extensions);
             $valid = ['jpg', 'jpeg', 'png', 'gif'];
 
-            if (0 === count(array_intersect($valid, $fieldConfig))) {
+            if (0 === \count(array_intersect($valid, $fieldConfig))) {
                 $display = false;
             }
         }
@@ -122,8 +114,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
     /**
      * Returns whether the picker supports the given value.
      *
-     * @param PickerConfig $config
-     *
      * @return bool
      */
     public function supportsValue(PickerConfig $config)
@@ -138,8 +128,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
     /**
      * Returns whether the picker is currently active.
      *
-     * @param PickerConfig $config
-     *
      * @return bool
      */
     public function isCurrent(PickerConfig $config)
@@ -149,8 +137,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Generates the URL for the picker.
-     *
-     * @param PickerConfig $config
      *
      * @return string
      */
