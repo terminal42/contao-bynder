@@ -3,7 +3,7 @@
 /*
  * Contao Bynder Bundle
  *
- * @copyright  Copyright (c) 2008-2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * This is just here because the php-sdk of bynder does not allow you to access
- * the base url
+ * the base url.
  */
 class Api extends BynderApi
 {
@@ -38,9 +38,11 @@ class Api extends BynderApi
     /**
      * Creates an instance of BynderApi using the settings provided.
      *
-     * @param array $settings Oauth credentials and settings to configure the BynderApi instance.
-     * @return BynderApi instance.
-     * @throws InvalidArgumentException Oauth settings not valid, consumer key or secret not in array.
+     * @param array $settings oauth credentials and settings to configure the BynderApi instance
+     *
+     * @throws InvalidArgumentException oauth settings not valid, consumer key or secret not in array
+     *
+     * @return BynderApi instance
      */
     public static function createLogged($settings, LoggerInterface $logger)
     {
@@ -50,14 +52,15 @@ class Api extends BynderApi
     /**
      * Creates an instance of BynderApi using the settings provided.
      *
-     * @param array $settings Oauth credentials and settings to configure the BynderApi instance.
-     * @return BynderApi instance.
-     * @throws InvalidArgumentException Oauth settings not valid, consumer key or secret not in array.
+     * @param array $settings oauth credentials and settings to configure the BynderApi instance
+     *
+     * @throws InvalidArgumentException oauth settings not valid, consumer key or secret not in array
+     *
+     * @return BynderApi instance
      */
     public static function create($settings)
     {
         if (isset($settings) && ($settings = self::validateSettings($settings))) {
-
             $credentials = new Credentials(
                 $settings['consumerKey'],
                 $settings['consumerSecret'],
@@ -78,7 +81,7 @@ class Api extends BynderApi
                     'token' => $credentials->getToken(),
                     'token_secret' => $credentials->getTokenSecret(),
                     'request_method' => Oauth1::REQUEST_METHOD_HEADER,
-                    'signature_method' => Oauth1::SIGNATURE_METHOD_HMAC
+                    'signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
                 ])
             );
 
@@ -89,16 +92,16 @@ class Api extends BynderApi
             ];
 
             // Configures request Client (adding proxy, etc.)
-            if (isset($settings['requestOptions']) && is_array($settings['requestOptions'])) {
+            if (isset($settings['requestOptions']) && \is_array($settings['requestOptions'])) {
                 $requestOptions += $settings['requestOptions'];
             }
 
             $requestClient = new Client($requestOptions);
             $requestHandler = OauthRequestHandler::create($credentials, $settings['baseUrl'], $requestClient);
+
             return new static($settings['baseUrl'], $requestHandler);
-        } else {
-            throw new InvalidArgumentException("Settings passed for BynderApi service creation are not valid.");
         }
+        throw new InvalidArgumentException('Settings passed for BynderApi service creation are not valid.');
     }
 
     /**
@@ -106,7 +109,7 @@ class Api extends BynderApi
      */
     public static function getLoggingMiddleware(LoggerInterface $logger)
     {
-        return function (callable $handler) use($logger) {
+        return function (callable $handler) use ($logger) {
             return function (RequestInterface $request, array $options) use ($handler, $logger) {
                 $start = microtime(true);
 

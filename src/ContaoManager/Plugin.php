@@ -3,7 +3,7 @@
 /*
  * Contao Bynder Bundle
  *
- * @copyright  Copyright (c) 2008-2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
@@ -25,8 +25,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     /**
      * Gets a list of autoload configurations for this bundle.
      *
-     * @param ParserInterface $parser
-     *
      * @return ConfigInterface[]
      */
     public function getBundles(ParserInterface $parser)
@@ -40,10 +38,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     /**
      * Returns a collection of routes for this bundle.
      *
-     * @param LoaderResolverInterface $resolver
-     * @param KernelInterface         $kernel
-     *
-     * @return null|RouteCollection
+     * @return RouteCollection|null
      */
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
     {
