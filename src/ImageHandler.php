@@ -156,7 +156,7 @@ class ImageHandler
             $result = $client->request('GET', $uri, [
                 'base_uri' => $this->api->getBaseUrl(),
                 'allow_redirects' => true,
-                'timeout' => 8,
+                'timeout' => 30, // In seconds
             ]);
         } catch (RequestException $e) {
             $this->logger->error('Could not import the Bynder derivative.', [
