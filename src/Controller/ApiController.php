@@ -11,7 +11,7 @@ namespace Terminal42\ContaoBynder\Controller;
 
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +21,7 @@ use Terminal42\ContaoBynder\ImageHandler;
 /**
  * @Route(defaults={"_scope" = "backend"})
  */
-class ApiController extends Controller
+class ApiController extends AbstractController
 {
     /**
      * @return Response

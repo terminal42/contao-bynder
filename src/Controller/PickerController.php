@@ -17,7 +17,7 @@ use Contao\CoreBundle\Picker\PickerBuilderInterface;
 use Contao\CoreBundle\Picker\PickerInterface;
 use Contao\System;
 use Environment;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route(defaults={"_scope" = "backend"})
  */
-class PickerController extends Controller
+class PickerController extends AbstractController
 {
     /**
      * @return Response
