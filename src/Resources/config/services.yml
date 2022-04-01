@@ -27,7 +27,7 @@ services:
             - 'derivativeOptions' # Set based on configuration in extension
             - 'targetDir' # Set based on configuration in extension
             - "@contao.framework"
-            - '%kernel.root_dir%/'
+            - '%kernel.project_dir%'
             - '%contao.upload_path%'
         tags:
             - { name: monolog.logger, channel: terminal42.contao_bynder }
