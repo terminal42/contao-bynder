@@ -12,12 +12,12 @@ namespace Terminal42\ContaoBynder\Controller;
 use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\Config;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Picker\PickerBuilderInterface;
 use Contao\CoreBundle\Picker\PickerInterface;
 use Contao\System;
 use Environment;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Knp\Menu\Renderer\RendererInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -26,8 +26,19 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route(defaults={"_scope" = "backend"})
  */
-class PickerController extends AbstractController
+class PickerController
 {
+    private ContaoFramework $framework;
+    private RendererInterface $menuRenderer;
+    private PickerBuilderInterface $pickerBuilder;
+
+    public function __construct(ContaoFramework $framework, RendererInterface $menuRenderer, PickerBuilderInterface $pickerBuilder)
+    {
+        $this->framework = $framework;
+        $this->menuRenderer = $menuRenderer;
+        $this->pickerBuilder = $pickerBuilder;
+    }
+
     /**
      * @return Response
      *
@@ -39,34 +50,28 @@ class PickerController extends AbstractController
             throw new BadRequestHttpException('Bynder Asset picker is supposed to be used within the Contao picker.');
         }
 
-        /** @var PickerBuilderInterface $pickerBuilder */
-        $pickerBuilder = $this->get('contao.picker.builder');
-        $picker = $pickerBuilder->createFromData($request->query->get('picker'));
+        $picker = $this->pickerBuilder->createFromData($request->query->get('picker'));
 
         if (null === $picker) {
             throw new BadRequestHttpException('Bynder Asset picker is supposed to have some data.');
         }
 
-        /** @var ContaoFrameworkInterface $framework */
-        $framework = $this->get('contao.framework');
-        $framework->initialize();
+        $this->framework->initialize();
 
         /** @var System $system */
-        $system = $framework->getAdapter(System::class);
+        $system = $this->framework->getAdapter(System::class);
         $system->loadLanguageFile('default');
 
         /** @var Controller $controller */
-        $controller = $framework->getAdapter(\Contao\Controller::class);
+        $controller = $this->framework->getAdapter(\Contao\Controller::class);
         $controller->setStaticUrls();
 
         $template = new BackendTemplate('be_main');
 
-        /** @var PickerBuilderInterface $pickerBuilder */
-        $pickerBuilder = $this->get('contao.picker.builder');
-        $picker = $pickerBuilder->createFromData($request->query->get('picker'));
+        $picker = $this->pickerBuilder->createFromData($request->query->get('picker'));
 
         if (($menu = $picker->getMenu()) && $menu->count() > 1) {
-            $template->pickerMenu = $this->get('contao.menu.renderer')->render($menu);
+            $template->pickerMenu = $this->menuRenderer->render($menu);
         }
 
         $template->main = $this->getInitHtml($picker);

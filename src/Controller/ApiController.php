@@ -9,20 +9,34 @@
 
 namespace Terminal42\ContaoBynder\Controller;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Terminal42\ContaoBynder\Api;
 use Terminal42\ContaoBynder\ImageHandler;
 
 /**
  * @Route(defaults={"_scope" = "backend"})
  */
-class ApiController extends AbstractController
+class ApiController
 {
+    private Api $api;
+    private Connection $connection;
+    private ContaoFramework $framework;
+    private ImageHandler $imageHandler;
+
+    public function __construct(Api $api, Connection $connection, ContaoFramework $framework, ImageHandler $imageHandler)
+    {
+        $this->api = $api;
+        $this->connection = $connection;
+        $this->framework = $framework;
+        $this->imageHandler = $imageHandler;
+    }
+
     /**
      * @return Response
      *
@@ -30,10 +44,8 @@ class ApiController extends AbstractController
      */
     public function mediapropertiesAction(Request $request)
     {
-        $api = $this->get('terminal42.contao_bynder.api');
-
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
-        $promise = $api->getAssetBankManager()->getMetaproperties('type=image&count=1');
+        $promise = $this->api->getAssetBankManager()->getMetaproperties('type=image&count=1');
 
         $properties = $promise->wait();
 
@@ -47,7 +59,6 @@ class ApiController extends AbstractController
      */
     public function imagesAction(Request $request)
     {
-        $api = $this->get('terminal42.contao_bynder.api');
         $limit = 25;
         $page = $request->query->getInt('page', 1);
         $preSelected = (array) explode(',', $request->query->get('preSelected'));
@@ -63,7 +74,7 @@ class ApiController extends AbstractController
         );
 
         /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
-        $promise = $api->getAssetBankManager()->getMediaList($queryString);
+        $promise = $this->api->getAssetBankManager()->getMediaList($queryString);
 
         $result = $promise->wait();
         $media = $result['media'];
@@ -87,9 +98,6 @@ class ApiController extends AbstractController
      */
     public function downloadAction(Request $request)
     {
-        /** @var ImageHandler $imageHandler */
-        $imageHandler = $this->get('terminal42.contao_bynder.image_handler');
-
         $mediaId = preg_replace('/[^a-zA-Z\d-]/', '', $request->query->get('mediaId'));
 
         $response = [
@@ -97,7 +105,7 @@ class ApiController extends AbstractController
             'uuid' => null,
         ];
 
-        $result = $imageHandler->importImage($mediaId);
+        $result = $this->imageHandler->importImage($mediaId);
 
         if (false === $result) {
             $response['status'] = 'FAILED';
@@ -153,11 +161,10 @@ class ApiController extends AbstractController
      */
     private function formatFilesize($bytes)
     {
-        $framework = $this->get('contao.framework');
-        $framework->initialize();
+        $this->framework->initialize();
 
         /** @var \Contao\System $system */
-        $system = $framework->getAdapter('Contao\System');
+        $system = $this->framework->getAdapter('Contao\System');
 
         $system->loadLanguageFile('default');
 
@@ -175,8 +182,7 @@ class ApiController extends AbstractController
             $bynderIds[] = $imageData['id'];
         }
 
-        $connection = $this->get('doctrine.dbal.default_connection');
-        $stmt = $connection->executeQuery('SELECT uuid,bynder_id,bynder_hash FROM tl_files WHERE bynder_id IN (?)',
+        $stmt = $this->connection->executeQuery('SELECT uuid,bynder_id,bynder_hash FROM tl_files WHERE bynder_id IN (?)',
             [$bynderIds],
             [Connection::PARAM_INT_ARRAY]
         );

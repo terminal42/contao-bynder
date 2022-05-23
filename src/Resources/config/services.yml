@@ -35,10 +35,15 @@ services:
 
     Terminal42\ContaoBynder\Controller\ApiController:
         public: true
-        calls:
-            - ['setContainer', ['@service_container']]
+        arguments:
+            - "@terminal42.contao_bynder.api"
+            - "@database_connection"
+            - "@contao.framework"
+            - "@terminal42.contao_bynder.image_handler"
 
     Terminal42\ContaoBynder\Controller\PickerController:
+        arguments:
+            - "@contao.framework"
+            - "@contao.menu.renderer"
+            - "@contao.picker.builder"
         public: true
-        calls:
-            - ['setContainer', ['@service_container']]
