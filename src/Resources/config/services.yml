@@ -32,3 +32,13 @@ services:
         tags:
             - { name: monolog.logger, channel: terminal42.contao_bynder }
         public: true
+
+    Terminal42\ContaoBynder\Controller\ApiController:
+        public: true
+        calls:
+            - ['setContainer', ['@service_container']]
+
+    Terminal42\ContaoBynder\Controller\PickerController:
+        public: true
+        calls:
+            - ['setContainer', ['@service_container']]
