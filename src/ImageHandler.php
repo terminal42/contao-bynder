@@ -267,11 +267,7 @@ class ImageHandler
      */
     private function getAbsoluteProjectDir()
     {
-        return realpath($this->rootDir
-            . \DIRECTORY_SEPARATOR
-            . '..'
-            . \DIRECTORY_SEPARATOR
-        );
+        return realpath($this->rootDir);
     }
 
     /**
