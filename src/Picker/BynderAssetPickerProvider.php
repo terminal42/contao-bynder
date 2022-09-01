@@ -50,7 +50,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'bynderAssetPicker';
     }
@@ -60,7 +60,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return string
      */
-    public function getUrl(PickerConfig $config)
+    public function getUrl(PickerConfig $config): string
     {
         return $this->generateUrl($config);
     }
@@ -70,7 +70,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return ItemInterface
      */
-    public function createMenuItem(PickerConfig $config)
+    public function createMenuItem(PickerConfig $config): ItemInterface
     {
         $GLOBALS['TL_CSS'][] = 'bundles/terminal42contaobynder/app.css';
 
@@ -106,7 +106,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return bool
      */
-    public function supportsContext($context)
+    public function supportsContext(string $context): bool
     {
         return 'file' === $context && !\in_array('1', (array) $this->getUser()->bynder_disable, true);
     }
@@ -116,7 +116,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return bool
      */
-    public function supportsValue(PickerConfig $config)
+    public function supportsValue(PickerConfig $config): bool
     {
         if ('file' === $config->getContext()) {
             return Validator::isUuid($config->getValue());
@@ -130,7 +130,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return bool
      */
-    public function isCurrent(PickerConfig $config)
+    public function isCurrent(PickerConfig $config): bool
     {
         return $config->getCurrent() === $this->getName();
     }
@@ -140,7 +140,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return string
      */
-    private function generateUrl(PickerConfig $config)
+    private function generateUrl(PickerConfig $config): string
     {
         $params = array_merge([
                 'popup' => '1',
@@ -158,7 +158,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      *
      * @return BackendUser
      */
-    private function getUser()
+    private function getUser(): BackendUser
     {
         if (null === $this->tokenStorage) {
             throw new \RuntimeException('No token storage provided');
