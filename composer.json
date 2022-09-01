@@ -14,7 +14,7 @@
         "ext-mbstring": "*",
         "contao/core-bundle": "^4.13 || ^5.0",
         "bynder/bynder-php-sdk": "^2.1",
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^7.5"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.0",
