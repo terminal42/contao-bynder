@@ -38,11 +38,8 @@ class Terminal42ContaoBynderExtension extends Extension
 
         // Configure API settings
         $settings = [
-            'consumerKey' => $config['consumerKey'],
-            'consumerSecret' => $config['consumerSecret'],
+            'domain' => $config['domain'],
             'token' => $config['token'],
-            'tokenSecret' => $config['tokenSecret'],
-            'baseUrl' => $config['baseUrl'],
         ];
         $api = $container->findDefinition('terminal42.contao_bynder.api');
         $api->setArgument(0, $settings);

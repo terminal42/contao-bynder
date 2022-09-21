@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.1",
         "ext-mbstring": "*",
         "contao/core-bundle": "^4.13 || ^5.0",
         "bynder/bynder-php-sdk": "^2.1",

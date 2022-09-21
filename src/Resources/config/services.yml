@@ -8,6 +8,13 @@ services:
         tags:
             - { name: contao.picker_provider }
 
+    terminal42.contao_bynder.api:
+        class: 'Terminal42\ContaoBynder\Api'
+        factory: ['Terminal42\ContaoBynder\Api', create]
+        arguments:
+            - 'settings' # Set based on configuration in extension
+        public: true
+
     terminal42.contao_bynder.image_handler:
         class: Terminal42\ContaoBynder\ImageHandler
         arguments:
