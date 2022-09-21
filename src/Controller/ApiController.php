@@ -189,7 +189,7 @@ class ApiController
 
         $downloaded = [];
 
-        foreach ($stmt->fetchAll() as $row) {
+        foreach ($stmt->fetchAllAssociative() as $row) {
             $downloaded[$row['bynder_id']] = [
                 'uuid' => StringUtil::binToUuid($row['uuid']),
                 'bynder_hash' => $row['bynder_hash'],

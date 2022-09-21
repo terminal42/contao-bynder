@@ -7,6 +7,8 @@
  * @author     terminal42 gmbh <info@terminal42.ch>
  */
 
+use Contao\FilesModel;
+
 $GLOBALS['TL_DCA']['tl_files']['config']['sql']['keys']['bynder_id'] = 'unique';
 $GLOBALS['TL_DCA']['tl_files']['fields']['bynder_id']['sql'] = ['type' => 'string', 'length' => 64, 'notnull' => false];
 $GLOBALS['TL_DCA']['tl_files']['fields']['bynder_hash']['sql'] = ['type' => 'string', 'length' => 64, 'notnull' => false];
@@ -18,7 +20,7 @@ $GLOBALS['TL_DCA']['tl_files']['list']['operations']['copy']['button_callback'] 
     $originalCallback = new tl_files();
     $original = $originalCallback->copyFile($row, $href, $label, $title, $icon, $attributes);
 
-    $model = \FilesModel::findByPath($row['id']);
+    $model = FilesModel::findByPath($row['id']);
     if (null === $model) {
         return $original;
     }
