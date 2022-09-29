@@ -18,5 +18,5 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['bynder_disable'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_user_group']['bynder_disable'],
     'exclude' => true,
     'inputType' => 'checkbox',
-    'sql' => ['type' => 'boolean'],
+    'sql' => ['type' => 'boolean', 'default' => 0],
 ];
