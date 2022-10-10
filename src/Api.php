@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Contao Bynder Bundle
  *
@@ -16,7 +18,7 @@ class Api extends BynderClient
 {
     public function getBaseUrl(): string
     {
-        return 'https://' .  $this->configuration->getBynderDomain();
+        return 'https://'.$this->configuration->getBynderDomain();
     }
 
     /**

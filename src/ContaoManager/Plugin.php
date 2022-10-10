@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Contao Bynder Bundle
  *
@@ -25,7 +27,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     /**
      * Gets a list of autoload configurations for this bundle.
      *
-     * @return ConfigInterface[]
+     * @return array<ConfigInterface>
      */
     public function getBundles(ParserInterface $parser)
     {
@@ -43,8 +45,8 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
     {
         return $resolver
-            ->resolve(__DIR__ . '/../Resources/config/routing.yml')
-            ->load(__DIR__ . '/../Resources/config/routing.yml')
+            ->resolve(__DIR__.'/../Resources/config/routing.yml')
+            ->load(__DIR__.'/../Resources/config/routing.yml')
             ;
     }
 }

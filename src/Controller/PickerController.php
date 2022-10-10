@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Contao Bynder Bundle
  *
@@ -105,11 +107,11 @@ class PickerController
         ]);
 
         return <<<VIEW
-<div class="tl_tree_radio"></div>
-<div id="bynder_interface"></div>
-<script>
-window.initBynderInterface('#bynder_interface', {mode: '$mode', labels: $labels, preSelected: $preSelected});
-</script>
-VIEW;
+            <div class="tl_tree_radio"></div>
+            <div id="bynder_interface"></div>
+            <script>
+            window.initBynderInterface('#bynder_interface', {mode: '$mode', labels: $labels, preSelected: $preSelected});
+            </script>
+            VIEW;
     }
 }

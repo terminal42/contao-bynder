@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Contao Bynder Bundle
  *
@@ -47,8 +49,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Returns the unique name for this picker.
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -57,8 +57,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Returns the URL to the picker based on the current value.
-     *
-     * @return string
      */
     public function getUrl(PickerConfig $config): string
     {
@@ -67,8 +65,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Creates the menu item for this picker.
-     *
-     * @return ItemInterface
      */
     public function createMenuItem(PickerConfig $config): ItemInterface
     {
@@ -101,10 +97,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Returns whether the picker supports the given context.
-     *
-     * @param string $context
-     *
-     * @return bool
      */
     public function supportsContext(string $context): bool
     {
@@ -113,8 +105,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Returns whether the picker supports the given value.
-     *
-     * @return bool
      */
     public function supportsValue(PickerConfig $config): bool
     {
@@ -127,8 +117,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Returns whether the picker is currently active.
-     *
-     * @return bool
      */
     public function isCurrent(PickerConfig $config): bool
     {
@@ -137,12 +125,11 @@ class BynderAssetPickerProvider implements PickerProviderInterface
 
     /**
      * Generates the URL for the picker.
-     *
-     * @return string
      */
     private function generateUrl(PickerConfig $config): string
     {
-        $params = array_merge([
+        $params = array_merge(
+            [
                 'popup' => '1',
                 'picker' => $config->cloneForCurrent($this->getName())->urlEncode(),
             ]
@@ -155,8 +142,6 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      * Returns the back end user object.
      *
      * @throws \RuntimeException
-     *
-     * @return BackendUser
      */
     private function getUser(): BackendUser
     {

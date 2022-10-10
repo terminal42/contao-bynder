@@ -18,7 +18,8 @@
         "doctrine/dbal": "^3.0"
     },
     "require-dev": {
-        "contao/manager-plugin": "^2.0"
+        "contao/manager-plugin": "^2.0",
+        "contao/easy-coding-standard": "^5.3"
     },
     "autoload": {
         "psr-4": {
@@ -27,5 +28,13 @@
     },
     "extra": {
         "contao-manager-plugin": "Terminal42\\ContaoBynder\\ContaoManager\\Plugin"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "ecs": "@php vendor/bin/ecs check src --config ecs.php --fix --ansi"
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Contao Bynder Bundle
  *
@@ -11,7 +13,9 @@ namespace Terminal42\ContaoBynder\Controller;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
+use Contao\System;
 use Doctrine\DBAL\Connection;
+use GuzzleHttp\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +48,7 @@ class ApiController
      */
     public function mediapropertiesAction(Request $request)
     {
-        /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
+        /** @var PromiseInterface $promise */
         $promise = $this->api->getAssetBankManager()->getMetaproperties('type=image&count=1');
 
         $properties = $promise->wait();
@@ -70,10 +74,10 @@ class ApiController
                 'orderBy' => 'name asc',
                 'count' => 1,
                 'page' => $page,
-            ]), null, '&')
+            ]), '', '&')
         );
 
-        /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
+        /** @var PromiseInterface $promise */
         $promise = $this->api->getAssetBankManager()->getMediaList($queryString);
 
         $result = $promise->wait();
@@ -81,6 +85,7 @@ class ApiController
 
         $images = [];
         $downloaded = $this->fetchDownloaded($media);
+
         foreach ($media as $imageData) {
             $images[] = $this->prepareImage($imageData, $downloaded, $preSelected);
         }
@@ -135,7 +140,8 @@ class ApiController
             'selected' => false,
             'downloaded' => false,
             'name' => $imageData['name'],
-            'meta' => sprintf('%s (%sx%s px)',
+            'meta' => sprintf(
+                '%s (%sx%s px)',
                 $this->formatFilesize($imageData['fileSize']),
                 $imageData['width'],
                 $imageData['height']
@@ -146,6 +152,7 @@ class ApiController
         if (isset($downloaded[$bynderId])) {
             $data['downloaded'] = $downloaded[$bynderId]['bynder_hash'] === $bynderHash;
             $data['uuid'] = $downloaded[$bynderId]['uuid'];
+
             if (\in_array($data['uuid'], $preSelected, true)) {
                 $data['selected'] = true;
             }
@@ -163,7 +170,7 @@ class ApiController
     {
         $this->framework->initialize();
 
-        /** @var \Contao\System $system */
+        /** @var System $system */
         $system = $this->framework->getAdapter('Contao\System');
 
         $system->loadLanguageFile('default');
@@ -182,7 +189,8 @@ class ApiController
             $bynderIds[] = $imageData['id'];
         }
 
-        $stmt = $this->connection->executeQuery('SELECT uuid,bynder_id,bynder_hash FROM tl_files WHERE bynder_id IN (?)',
+        $stmt = $this->connection->executeQuery(
+            'SELECT uuid,bynder_id,bynder_hash FROM tl_files WHERE bynder_id IN (?)',
             [$bynderIds],
             [Connection::PARAM_INT_ARRAY]
         );
