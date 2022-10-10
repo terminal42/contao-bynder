@@ -48,4 +48,4 @@ services:
     Terminal42\ContaoBynder\EventListener\FilesCopyButtonListener:
         public: true
         tags:
-            - { name: contao.callback, table: tl_files, target: list.operations.copy.button_callback }
+            - { name: contao.callback, table: tl_files, target: list.operations.copy.button }
