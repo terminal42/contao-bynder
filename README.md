@@ -110,3 +110,21 @@ and name it e.g. "contao_bynder_integration" and configure the settings already 
 
 
 [1]: https://help.bynder.com/Modules/Asset-Bank/Modify-public-derivatives-on-the-fly.htm
+
+
+## Upgrade from 1.x to 2.x
+
+In order to upgrade the extension to version 2, you need to take the following steps:
+
+1. Obtain the permanent token as described on https://support.bynder.com/hc/en-us/articles/360013875300-Permanent-Tokens
+2. Update the `config.yml` file as follows:
+
+```diff
+terminal42_contao_bynder:
+-    consumerKey: 'foobar'
+-    consumerSecret: 'foobar'
+-    token: 'foobar'
+-    tokenSecret: 'foobar'
++    domain: 'foobar.getbynder.com'
++    token: '2a7a5243548…32739e624dc'
+```
