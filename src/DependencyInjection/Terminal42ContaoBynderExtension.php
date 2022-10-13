@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Contao Bynder Bundle
  *
@@ -24,25 +26,22 @@ class Terminal42ContaoBynderExtension extends Extension
      *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new YamlFileLoader(
             $container,
-            new FileLocator(__DIR__ . '/../Resources/config')
+            new FileLocator(__DIR__.'/../Resources/config')
         );
 
         $loader->load('services.yml');
 
         // Configure API settings
         $settings = [
-            'consumerKey' => $config['consumerKey'],
-            'consumerSecret' => $config['consumerSecret'],
+            'domain' => $config['domain'],
             'token' => $config['token'],
-            'tokenSecret' => $config['tokenSecret'],
-            'baseUrl' => $config['baseUrl'],
         ];
         $api = $container->findDefinition('terminal42.contao_bynder.api');
         $api->setArgument(0, $settings);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Contao Bynder Bundle
  *
@@ -15,8 +17,8 @@ use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Picker\PickerBuilderInterface;
 use Contao\CoreBundle\Picker\PickerInterface;
+use Contao\Environment;
 use Contao\System;
-use Environment;
 use Knp\Menu\Renderer\RendererInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,13 +60,7 @@ class PickerController
 
         $this->framework->initialize();
 
-        /** @var System $system */
-        $system = $this->framework->getAdapter(System::class);
-        $system->loadLanguageFile('default');
-
-        /** @var Controller $controller */
-        $controller = $this->framework->getAdapter(\Contao\Controller::class);
-        $controller->setStaticUrls();
+        System::loadLanguageFile('default');
 
         $template = new BackendTemplate('be_main');
 
@@ -111,11 +107,11 @@ class PickerController
         ]);
 
         return <<<VIEW
-<div class="tl_tree_radio"></div>
-<div id="bynder_interface"></div>
-<script>
-window.initBynderInterface('#bynder_interface', {mode: '$mode', labels: $labels, preSelected: $preSelected});
-</script>
-VIEW;
+            <div class="tl_tree_radio"></div>
+            <div id="bynder_interface"></div>
+            <script>
+            window.initBynderInterface('#bynder_interface', {mode: '$mode', labels: $labels, preSelected: $preSelected});
+            </script>
+            VIEW;
     }
 }

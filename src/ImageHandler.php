@@ -9,9 +9,8 @@
 
 namespace Terminal42\ContaoBynder;
 
-use Bynder\Api\IBynderApi;
 use Contao\Automator;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\StringUtil;
@@ -27,7 +26,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class ImageHandler
 {
     /**
-     * @var IBynderApi
+     * @var Api
      */
     private $api;
 
@@ -52,7 +51,7 @@ class ImageHandler
     private $targetDir;
 
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     private $contaoFramework;
 
@@ -79,7 +78,7 @@ class ImageHandler
      * @param        $rootDir
      * @param string $uploadPath
      */
-    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, array $derivativeOptions, $targetDir, ContaoFrameworkInterface $contaoFramework, $rootDir, $uploadPath)
+    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, array $derivativeOptions, $targetDir, ContaoFramework $contaoFramework, $rootDir, $uploadPath)
     {
         $this->api = $api;
         $this->logger = $logger;
@@ -125,12 +124,10 @@ class ImageHandler
 
         try {
             $stack = HandlerStack::create();
-            $stack->push(Api::getLoggingMiddleware($this->logger));
             $stack->push(Middleware::retry(function (
                 $retries,
                 Request $request,
                 Response $response = null,
-                RequestException $exception = null
             ) {
                 if ($retries >= 5) {
                     return false;
