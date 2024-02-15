@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Contao Bynder Bundle
- *
- * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
- * @author     terminal42 gmbh <info@terminal42.ch>
- */
-
 namespace Terminal42\ContaoBynder\Picker;
 
 use Contao\BackendUser;
@@ -17,34 +10,18 @@ use Contao\CoreBundle\Picker\PickerProviderInterface;
 use Contao\Validator;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BynderAssetPickerProvider implements PickerProviderInterface
 {
-    /**
-     * @var FactoryInterface
-     */
-    private $menuFactory;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
-    /**
-     * Constructor.
-     */
-    public function __construct(FactoryInterface $menuFactory, RouterInterface $router, TokenStorageInterface $tokenStorage)
-    {
-        $this->menuFactory = $menuFactory;
-        $this->router = $router;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        private readonly FactoryInterface $menuFactory,
+        private readonly RouterInterface $router,
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly Packages $packages
+    ) {
     }
 
     /**
@@ -68,14 +45,14 @@ class BynderAssetPickerProvider implements PickerProviderInterface
      */
     public function createMenuItem(PickerConfig $config): ItemInterface
     {
-        $GLOBALS['TL_CSS'][] = 'bundles/terminal42contaobynder/app.css';
+        $GLOBALS['TL_CSS'][] = $this->packages->getUrl('app.css', 'terminal42_contao_bynder');
 
         $name = $this->getName();
         $extensions = $config->getExtra('extensions');
         $display = true;
 
         if (null !== $extensions) {
-            $fieldConfig = explode(',', $extensions);
+            $fieldConfig = explode(',', (string) $extensions);
             $valid = ['jpg', 'jpeg', 'png', 'gif'];
 
             if (0 === \count(array_intersect($valid, $fieldConfig))) {
@@ -83,16 +60,13 @@ class BynderAssetPickerProvider implements PickerProviderInterface
             }
         }
 
-        return $this->menuFactory->createItem(
-            $name,
-            [
-                'label' => 'Bynder Asset Management',
-                'linkAttributes' => ['class' => $name],
-                'current' => $this->isCurrent($config),
-                'uri' => $this->generateUrl($config),
-                'display' => $display,
-            ]
-        );
+        return $this->menuFactory->createItem($name, [
+            'label' => 'Bynder Asset Management',
+            'linkAttributes' => ['class' => $name],
+            'current' => $this->isCurrent($config),
+            'uri' => $this->generateUrl($config),
+            'display' => $display,
+        ]);
     }
 
     /**
@@ -132,7 +106,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
             [
                 'popup' => '1',
                 'picker' => $config->cloneForCurrent($this->getName())->urlEncode(),
-            ]
+            ],
         );
 
         return $this->router->generate('bynder_asset_picker', $params);

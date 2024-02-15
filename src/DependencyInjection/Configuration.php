@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Contao Bynder Bundle
- *
- * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
- * @author     terminal42 gmbh <info@terminal42.ch>
- */
-
 namespace Terminal42\ContaoBynder\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -16,15 +9,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * Generates the configuration tree builder.
-     *
-     * @return TreeBuilder The tree builder
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('terminal42_contao_bynder');
-
         $treeBuilder
             ->getRootNode()
             ->children()

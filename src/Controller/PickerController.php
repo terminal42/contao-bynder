@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Contao Bynder Bundle
- *
- * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
- * @author     terminal42 gmbh <info@terminal42.ch>
- */
-
 namespace Terminal42\ContaoBynder\Controller;
 
 use Contao\Backend;
@@ -20,33 +13,25 @@ use Contao\CoreBundle\Picker\PickerInterface;
 use Contao\Environment;
 use Contao\System;
 use Knp\Menu\Renderer\RendererInterface;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(defaults={"_scope" = "backend"})
- */
+#[Route(defaults: ['_scope' => 'backend'])]
 class PickerController
 {
-    private ContaoFramework $framework;
-    private RendererInterface $menuRenderer;
-    private PickerBuilderInterface $pickerBuilder;
-
-    public function __construct(ContaoFramework $framework, RendererInterface $menuRenderer, PickerBuilderInterface $pickerBuilder)
-    {
-        $this->framework = $framework;
-        $this->menuRenderer = $menuRenderer;
-        $this->pickerBuilder = $pickerBuilder;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RendererInterface $menuRenderer,
+        private readonly PickerBuilderInterface $pickerBuilder,
+        private readonly Packages $packages
+    ) {
     }
 
-    /**
-     * @return Response
-     *
-     * @Route("/_bynder_asset_picker", name="bynder_asset_picker")
-     */
-    public function pickerAction(Request $request)
+    #[Route(path: '/_bynder_asset_picker', name: 'bynder_asset_picker')]
+    public function pickerAction(Request $request): Response
     {
         if (!$request->query->has('picker')) {
             throw new BadRequestHttpException('Bynder Asset picker is supposed to be used within the Contao picker.');
@@ -79,15 +64,12 @@ class PickerController
         $template->language = $GLOBALS['TL_LANGUAGE'];
         $template->charset = Config::get('characterSet');
 
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/terminal42contaobynder/app.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('app.js', 'terminal42_contao_bynder');
 
         return $template->getResponse();
     }
 
-    /**
-     * @return string
-     */
-    private function getInitHtml(PickerInterface $picker)
+    private function getInitHtml(PickerInterface $picker): string
     {
         $config = $picker->getConfig();
 

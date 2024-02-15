@@ -2,23 +2,18 @@
 
 declare(strict_types=1);
 
-/*
- * Contao Bynder Bundle
- *
- * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
- * @author     terminal42 gmbh <info@terminal42.ch>
- */
-
 namespace Terminal42\ContaoBynder\EventListener;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\FilesModel;
 
+#[AsCallback('tl_files', 'list.operations.copy.button')]
 class FilesCopyButtonListener
 {
     /**
      * Disable copying bynder assets.
      */
-    public function __invoke($row, $href, $label, $title, $icon, $attributes): string
+    public function __invoke(array $row, $href, $label, $title, $icon, $attributes): string
     {
         $originalCallback = new \tl_files();
         $original = $originalCallback->copyFile($row, $href, $label, $title, $icon, $attributes);

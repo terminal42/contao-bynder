@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Contao Bynder Bundle
- *
- * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
- * @author     terminal42 gmbh <info@terminal42.ch>
- */
-
 namespace Terminal42\ContaoBynder\Controller;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -18,35 +11,23 @@ use Doctrine\DBAL\Connection;
 use GuzzleHttp\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Terminal42\ContaoBynder\Api;
 use Terminal42\ContaoBynder\ImageHandler;
 
-/**
- * @Route(defaults={"_scope" = "backend"})
- */
+#[Route(defaults: ['_scope' => 'backend'])]
 class ApiController
 {
-    private Api $api;
-    private Connection $connection;
-    private ContaoFramework $framework;
-    private ImageHandler $imageHandler;
-
-    public function __construct(Api $api, Connection $connection, ContaoFramework $framework, ImageHandler $imageHandler)
-    {
-        $this->api = $api;
-        $this->connection = $connection;
-        $this->framework = $framework;
-        $this->imageHandler = $imageHandler;
+    public function __construct(
+        private readonly Api $api,
+        private readonly Connection $connection,
+        private readonly ContaoFramework $framework,
+        private readonly ImageHandler $imageHandler,
+    ) {
     }
 
-    /**
-     * @return Response
-     *
-     * @Route("/_bynder_api/metaproperties", name="bynder_api_metaproperties")
-     */
-    public function mediapropertiesAction(Request $request)
+    #[Route(path: '/_bynder_api/metaproperties', name: 'bynder_api_metaproperties')]
+    public function mediapropertiesAction(Request $request): JsonResponse
     {
         /** @var PromiseInterface $promise */
         $promise = $this->api->getAssetBankManager()->getMetaproperties('type=image&count=1');
@@ -56,16 +37,12 @@ class ApiController
         return new JsonResponse($properties);
     }
 
-    /**
-     * @return Response
-     *
-     * @Route("/_bynder_api/images", name="bynder_api_images")
-     */
-    public function imagesAction(Request $request)
+    #[Route(path: '/_bynder_api/images', name: 'bynder_api_images')]
+    public function imagesAction(Request $request): JsonResponse
     {
         $limit = 25;
         $page = $request->query->getInt('page', 1);
-        $preSelected = (array) explode(',', $request->query->get('preSelected'));
+        $preSelected = (array) explode(',', (string) $request->query->get('preSelected'));
 
         $queryString = Request::normalizeQueryString(
             http_build_query(array_merge($request->query->all(), [
@@ -74,7 +51,7 @@ class ApiController
                 'orderBy' => 'name asc',
                 'count' => 1,
                 'page' => $page,
-            ]), '', '&')
+            ]), '', '&'),
         );
 
         /** @var PromiseInterface $promise */
@@ -96,14 +73,10 @@ class ApiController
         ]);
     }
 
-    /**
-     * @return Response
-     *
-     * @Route("/_bynder_api/download", name="bynder_api_download")
-     */
-    public function downloadAction(Request $request)
+    #[Route(path: '/_bynder_api/download', name: 'bynder_api_download')]
+    public function downloadAction(Request $request): JsonResponse
     {
-        $mediaId = preg_replace('/[^a-zA-Z\d-]/', '', $request->query->get('mediaId'));
+        $mediaId = preg_replace('/[^a-zA-Z\d-]/', '', (string) $request->query->get('mediaId'));
 
         $response = [
             'status' => 'OK',
@@ -121,10 +94,7 @@ class ApiController
         return new JsonResponse($response);
     }
 
-    /**
-     * @return array
-     */
-    private function prepareImage(array $imageData, array $downloaded, array $preSelected)
+    private function prepareImage(array $imageData, array $downloaded, array $preSelected): array
     {
         $thumb = (object) [
             'src' => $imageData['thumbnails']['mini'],
@@ -142,9 +112,9 @@ class ApiController
             'name' => $imageData['name'],
             'meta' => sprintf(
                 '%s (%sx%s px)',
-                $this->formatFilesize($imageData['fileSize']),
+                $this->formatFilesize((int) $imageData['fileSize']),
                 $imageData['width'],
-                $imageData['height']
+                $imageData['height'],
             ),
             'thumb' => $thumb,
         ];
@@ -161,27 +131,19 @@ class ApiController
         return $data;
     }
 
-    /**
-     * @param int $bytes
-     *
-     * @return string
-     */
-    private function formatFilesize($bytes)
+    private function formatFilesize(int $bytes): string
     {
         $this->framework->initialize();
 
         /** @var System $system */
-        $system = $this->framework->getAdapter('Contao\System');
+        $system = $this->framework->getAdapter(System::class);
 
         $system->loadLanguageFile('default');
 
         return $system->getReadableSize($bytes);
     }
 
-    /**
-     * @return array
-     */
-    private function fetchDownloaded(array $media)
+    private function fetchDownloaded(array $media): array
     {
         $bynderIds = [];
 
@@ -192,7 +154,7 @@ class ApiController
         $stmt = $this->connection->executeQuery(
             'SELECT uuid,bynder_id,bynder_hash FROM tl_files WHERE bynder_id IN (?)',
             [$bynderIds],
-            [Connection::PARAM_INT_ARRAY]
+            [Connection::PARAM_INT_ARRAY],
         );
 
         $downloaded = [];
@@ -207,14 +169,7 @@ class ApiController
         return $downloaded;
     }
 
-    /**
-     * @param int $page
-     * @param int $limit
-     * @param int $total
-     *
-     * @return array
-     */
-    private function calculatePagination($page, $limit, $total)
+    private function calculatePagination(int $page, int $limit, int $total): array
     {
         $totalPages = ceil($total / $limit);
         $hasPrevious = $page > 1;
