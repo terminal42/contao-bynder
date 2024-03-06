@@ -26,7 +26,7 @@ class PickerController
         private readonly ContaoFramework $framework,
         private readonly RendererInterface $menuRenderer,
         private readonly PickerBuilderInterface $pickerBuilder,
-        private readonly Packages $packages
+        private readonly Packages $packages,
     ) {
     }
 

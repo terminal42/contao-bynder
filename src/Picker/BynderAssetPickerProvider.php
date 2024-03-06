@@ -20,7 +20,7 @@ class BynderAssetPickerProvider implements PickerProviderInterface
         private readonly FactoryInterface $menuFactory,
         private readonly RouterInterface $router,
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly Packages $packages
+        private readonly Packages $packages,
     ) {
     }
 
