@@ -7,6 +7,7 @@ use Terminal42\ContaoBynder\Api;
 use Terminal42\ContaoBynder\Controller\ApiController;
 use Terminal42\ContaoBynder\Controller\PickerController;
 use Terminal42\ContaoBynder\EventListener\FilesCopyButtonListener;
+use Terminal42\ContaoBynder\EventListener\StoreDbafsMetadataEventListener;
 use Terminal42\ContaoBynder\ImageHandler;
 use Terminal42\ContaoBynder\Picker\BynderAssetPickerProvider;
 
@@ -32,14 +33,12 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->set(ImageHandler::class)
         ->args([
+            service('contao.filesystem.virtual.files'),
             service(Api::class),
             service('logger'),
             'derivativeName',
             'derivativeOptions',
             'targetDir',
-            service('contao.framework'),
-            '%kernel.project_dir%',
-            '%contao.upload_path%',
         ])
         ->tag('monolog.logger', [
             'channel' => 'terminal42.contao_bynder',
@@ -68,4 +67,5 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services->set(FilesCopyButtonListener::class);
+    $services->set(StoreDbafsMetadataEventListener::class);
 };
