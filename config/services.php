@@ -67,5 +67,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services->set(FilesCopyButtonListener::class);
-    $services->set(StoreDbafsMetadataEventListener::class);
+
+    $services->set(StoreDbafsMetadataEventListener::class)
+        ->args([
+            service(Api::class),
+            service('twig'),
+            service('logger'),
+            [],
+        ])
+        ->tag('monolog.logger', [
+            'channel' => 'terminal42.contao_bynder',
+        ])
+    ;
 };

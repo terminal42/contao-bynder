@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Terminal42\ContaoBynder\Api;
+use Terminal42\ContaoBynder\EventListener\StoreDbafsMetadataEventListener;
 use Terminal42\ContaoBynder\ImageHandler;
 
 class Terminal42ContaoBynderExtension extends Extension
@@ -38,5 +39,9 @@ class Terminal42ContaoBynderExtension extends Extension
         $imageHandler->setArgument(3, $config['derivativeName']);
         $imageHandler->setArgument(4, $config['derivativeOptions']);
         $imageHandler->setArgument(5, $config['targetDir']);
+
+        // Meta data import
+        $metadataEventListener = $container->findDefinition(StoreDbafsMetadataEventListener::class);
+        $metadataEventListener->setArgument(3, $config['metaImportMapper']);
     }
 }

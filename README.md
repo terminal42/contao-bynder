@@ -20,7 +20,6 @@ even multiple Contao setups.
 - [ ] Support the picker wizard in Contao, not only the FileTree widget
 - [ ] Support other assets, not only `image`
 - [ ] Support Contao's important part based on `activeOriginalFocusPoint`?
-- [ ] Import meta data such as description? Multilingual?
 - [ ] More?
 
 ## Installation
@@ -69,8 +68,18 @@ terminal42_contao_bynder:
         w: 3000
         h: 3000
         crop: false
-
+    metaImportMapper:
+        de:
+            title: '{{ name }}'
+            alt: "{{ tags|join(', ') }}"
+            caption: '© {{ property_copyright }}. {{ property_lizenzart }}'
 ```
+
+With the `metaImportMapper` you can configure the way you want to import metadata from Bynder to Contao's metadata widget.
+The key is the language. In our example this is `de` but you can also specify multiple languages, if you wanted to.
+This bundle automatically converts your custom media properties and fetches the correct values based on the language for it.
+It will also check if the media property is configured to allow multiple or only single values. So you don't have to worry
+about converting arrays with only one value into a string. The templates expect a valid Twig string.
 
 4) Configure your Bynder Account
 

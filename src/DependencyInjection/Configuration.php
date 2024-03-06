@@ -42,6 +42,10 @@ class Configuration implements ConfigurationInterface
                     ->info('The derivativeOptions contains an array of parameters (key -> value) that are added to the derivative URL when fetching the derivative. Note that this only works for on-the-fly derivatives.')
                     ->treatNullLike([])
                 ->end()
+                ->variableNode('metaImportMapper')
+                    ->info('The metaImportMapper contains an array of languages and nested array values for meta data mapping (key -> value). See docs for more information.')
+                    ->treatNullLike([])
+                ->end()
             ->end()
         ;
 
