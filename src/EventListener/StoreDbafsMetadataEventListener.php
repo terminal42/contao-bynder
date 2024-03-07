@@ -15,6 +15,8 @@ use Twig\Environment;
 #[AsEventListener]
 class StoreDbafsMetadataEventListener
 {
+    private const IMPORTANT_PART_SQUARE_LENGTH_IN_PX = 100;
+
     public function __construct(
         private Api $api,
         private Environment $twig,
@@ -27,22 +29,62 @@ class StoreDbafsMetadataEventListener
     {
         $meta = $event->getExtraMetadata();
 
-        if (!isset($meta[ImageHandler::METADATA_KEY])) {
+        if (!isset($meta[ImageHandler::MEDIA_KEY])) {
             return;
         }
 
-        $event->set('bynder_id', $meta[ImageHandler::METADATA_KEY]['id']);
-        $event->set('bynder_hash', $meta[ImageHandler::METADATA_KEY]['idHash']);
+        $event->set('bynder_id', $meta[ImageHandler::MEDIA_KEY]['id']);
+        $event->set('bynder_hash', $meta[ImageHandler::MEDIA_KEY]['idHash']);
 
+        $this->importMetadata($event, $meta[ImageHandler::MEDIA_KEY]);
+        $this->importImportantPath($event, $meta[ImageHandler::MEDIA_KEY], $meta[ImageHandler::IMAGE_DIMENSIONS_KEY] ?? []);
+    }
+
+    private function importImportantPath(StoreDbafsMetadataEvent $event, array $mediaInfo, array $imageDimensions): void
+    {
+        if (
+            !isset($imageDimensions['width'])
+            || !isset($imageDimensions['height'])
+            || !isset($mediaInfo['width'])
+            || !isset($mediaInfo['height'])
+            || !isset($mediaInfo['activeOriginalFocusPoint']['x'])
+            || !isset($mediaInfo['activeOriginalFocusPoint']['y'])
+        ) {
+            return;
+        }
+
+        // Adjust the focus point of the original file to our relative file dimensions of
+        // the derivative
+        $x = (int) round($imageDimensions['width'] / $mediaInfo['width'] * $mediaInfo['activeOriginalFocusPoint']['x']);
+        $y = (int) round($imageDimensions['height'] / $mediaInfo['height'] * $mediaInfo['activeOriginalFocusPoint']['y']);
+
+        $x = $x - self::IMPORTANT_PART_SQUARE_LENGTH_IN_PX / 2;
+        $y = $y - self::IMPORTANT_PART_SQUARE_LENGTH_IN_PX / 2;
+
+        if ($x < 0 || $y < 0) {
+            return;
+        }
+
+        // Our important part configuration is in percentages
+        $event->set('importantPartX', $x / $imageDimensions['width']);
+        $event->set('importantPartY', $y / $imageDimensions['height']);
+        $event->set('importantPartWidth', self::IMPORTANT_PART_SQUARE_LENGTH_IN_PX / $imageDimensions['width']);
+        $event->set('importantPartHeight', self::IMPORTANT_PART_SQUARE_LENGTH_IN_PX / $imageDimensions['height']);
+
+        // dd($mediaInfo, $imageDimensions, $x, $y, $event);
+    }
+
+    private function importMetadata(StoreDbafsMetadataEvent $event, array $mediaInfo): void
+    {
         if ([] === $this->metaConfig) {
             return;
         }
 
         try {
-            $event->set('meta', serialize($this->retrieveMeta($meta[ImageHandler::METADATA_KEY])));
+            $event->set('meta', serialize($this->retrieveMeta($mediaInfo)));
         } catch (\Throwable $t) {
             $this->logger->error(sprintf('Could not automatically add the meta data for Bynder media ID "%s". Reason: %s',
-                $meta[ImageHandler::METADATA_KEY]['id'],
+                $mediaInfo['id'],
                 $t->getMessage(),
             ), ['exception' => $t]);
         }

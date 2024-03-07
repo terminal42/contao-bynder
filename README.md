@@ -1,11 +1,11 @@
 # terminal42/contao-bynder
 
-This bundle integrates Bynder Asset Management directly into your Contao 4.4+
-back end. Because as of today, Contao can only work with images that have been
-uploaded to the filesystem (no filesystem abstraction yet), it works by adding
-a new tab next to the regular file picker tab where you can choose your images
-of your Bynder Asset Management account. You can search and filter your Bynder
-assets, download and then select them right from the file tree widget.
+This bundle integrates Bynder Asset Management directly into your Contao 5.3+ back end. It works by adding new tab next
+to the regular file picker tab where you can choose your images of your Bynder Asset Management account. You can search
+and filter your Bynder assets, download and then select them right from the file tree widget.
+
+You can configure which metadata should be imported and how and the bundle also takes care to map your configured 
+Bynder focus point to Contao's important path configuration.
 
 ## Why would I need this, if it still downloads all the files to the system?
 
@@ -19,7 +19,6 @@ even multiple Contao setups.
 - [ ] Find a way how one can control which filters are shown and which ones are not
 - [ ] Support the picker wizard in Contao, not only the FileTree widget
 - [ ] Support other assets, not only `image`
-- [ ] Support Contao's important part based on `activeOriginalFocusPoint`?
 - [ ] More?
 
 ## Installation
@@ -30,29 +29,7 @@ even multiple Contao setups.
 $ composer require terminal42/contao-bynder
 ```
 
-2) Enable the bundle (you can skip this if you're using the Contao Managed Edition!)
-
-Enable the bundle by adding the following line in the app/AppKernel.php` file of your project:
-
-```php
-<?php
-
-// app/AppKernel.php
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        $bundles = array(
-            // ...
-            new Terminal42\ContaoBynder\Terminal42ContaoBynderBundle(),
-        );
-
-        // ...
-    }
-}
-```
-
-3) Configure the bundle
+2) Configure the bundle
 
 Edit your `config.yml` file and add the necessary configuration parameters as
 follows:
@@ -81,7 +58,7 @@ This bundle automatically converts your custom media properties and fetches the 
 It will also check if the media property is configured to allow multiple or only single values. So you don't have to worry
 about converting arrays with only one value into a string. The templates expect a valid Twig string.
 
-4) Configure your Bynder Account
+3) Configure your Bynder Account
 
 Bynder can handle huge file assets that do not even make sense in a web environment
 such as a 750 MB TIFF image. However, Bynder knows the concept of "derivatives".

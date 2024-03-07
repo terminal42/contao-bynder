@@ -15,7 +15,9 @@ use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
 class ImageHandler
 {
-    public const METADATA_KEY = 't42_bynder';
+    public const MEDIA_KEY = 't42_bynder_media';
+
+    public const IMAGE_DIMENSIONS_KEY = 't42_bynder_image_dimensions';
 
     public function __construct(
         private readonly VirtualFilesystemInterface $virtualFilesystem,
@@ -90,7 +92,17 @@ class ImageHandler
             return false;
         }
 
-        $this->virtualFilesystem->setExtraMetadata($targetPath, [self::METADATA_KEY => $media]);
+        $imageDimensions = [];
+
+        if (\is_array($tmp = @getimagesizefromstring($fileContents))) {
+            $imageDimensions['width'] = $tmp[0];
+            $imageDimensions['height'] = $tmp[1];
+        }
+
+        $this->virtualFilesystem->setExtraMetadata($targetPath, [
+            self::MEDIA_KEY => $media,
+            self::IMAGE_DIMENSIONS_KEY => $imageDimensions,
+        ]);
 
         return $uuid;
     }

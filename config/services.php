@@ -67,7 +67,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services->set(FilesCopyButtonListener::class);
-
     $services->set(StoreDbafsMetadataEventListener::class)
         ->args([
             service(Api::class),
