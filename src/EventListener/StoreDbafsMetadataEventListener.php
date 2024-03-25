@@ -70,8 +70,6 @@ class StoreDbafsMetadataEventListener
         $event->set('importantPartY', $y / $imageDimensions['height']);
         $event->set('importantPartWidth', self::IMPORTANT_PART_SQUARE_LENGTH_IN_PX / $imageDimensions['width']);
         $event->set('importantPartHeight', self::IMPORTANT_PART_SQUARE_LENGTH_IN_PX / $imageDimensions['height']);
-
-        // dd($mediaInfo, $imageDimensions, $x, $y, $event);
     }
 
     private function importMetadata(StoreDbafsMetadataEvent $event, array $mediaInfo): void
