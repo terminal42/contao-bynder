@@ -1,3 +1,7 @@
+@import "./../../node_modules/ldbutton/index.css";
+@import "./../../node_modules/@loadingio/loading.css/loading.utils.css";
+@import "./../../node_modules/@loadingio/loading.css/entries/cycle.css";
+
 #picker-menu {
   a.bynderAssetPicker {
     background-image:url("../img/bynder-logo.svg");
@@ -6,10 +10,6 @@
 }
 
 #bynder-asset-mgmt .download-button {
-
-  @import 'loading';
-  @import 'loading-btn';
-
   .button {
     color: #fff;
     background-color: #0af;
@@ -21,10 +21,10 @@
     white-space: nowrap;
     vertical-align: middle;
     cursor: pointer;
-  }
+  }/*
   .ld-ring:after {
     box-sizing: border-box;
-  }
+  }*/
 }
 
 #bynder-asset-mgmt {
@@ -46,8 +46,6 @@
     margin: 88px auto;
     position: relative;
     font-size: 11px;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
     transform: translateZ(0);
     -webkit-animation-delay: -0.16s;
     animation-delay: -0.16s;

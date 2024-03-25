@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import VueResource from 'vue-resource';
 import App from './components/App.vue';
-
-require('../css/styles.scss');
+import '../css/styles.scss';
 
 Vue.use(VueResource);
 

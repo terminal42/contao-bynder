@@ -1,15 +1,9 @@
-var Encore = require('@symfony/webpack-encore');
+const { Encore } = require('@terminal42/contao-build-tools');
 
-Encore
-    .setOutputPath('src/Resources/public')
+module.exports = Encore()
+    .setOutputPath('public/')
     .setPublicPath('/bundles/terminal42contaobynder')
-    .addEntry('app', './view/js/app.js')
-    .disableSingleRuntimeChunk()
     .enableVueLoader()
-    .cleanupOutputBeforeBuild()
-    .enableSourceMaps(!Encore.isProduction())
-    .enableSassLoader()
-    .setManifestKeyPrefix('bundles/terminal42contaobynder')
+    .addEntry('app', './view/js/app.js')
+    .getWebpackConfig()
 ;
-
-module.exports = Encore.getWebpackConfig();

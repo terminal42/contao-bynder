@@ -1,170 +1,70 @@
 <?php
 
-/*
- * Contao Bynder Bundle
- *
- * @copyright  Copyright (c) 2008-2021, terminal42 gmbh
- * @author     terminal42 gmbh <info@terminal42.ch>
- */
+declare(strict_types=1);
 
 namespace Terminal42\ContaoBynder;
 
 use Contao\Automator;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Dbafs;
-use Contao\FilesModel;
-use Contao\StringUtil;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
+use Contao\CoreBundle\Filesystem\VirtualFilesystemInterface;
+use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\HttpOptions;
+use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
 class ImageHandler
 {
-    /**
-     * @var Api
-     */
-    private $api;
+    public const MEDIA_KEY = 't42_bynder_media';
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    public const IMAGE_DIMENSIONS_KEY = 't42_bynder_image_dimensions';
 
-    /**
-     * @var string
-     */
-    private $derivativeName;
-
-    /**
-     * @var array
-     */
-    private $derivativeOptions;
-
-    /**
-     * @var string
-     */
-    private $targetDir;
-
-    /**
-     * @var ContaoFramework
-     */
-    private $contaoFramework;
-
-    /**
-     * @var string
-     */
-    private $rootDir;
-
-    /**
-     * @var string
-     */
-    private $uploadPath;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    /**
-     * ImageHandler constructor.
-     *
-     * @param        $derivativeName
-     * @param        $targetDir
-     * @param        $rootDir
-     * @param string $uploadPath
-     */
-    public function __construct(Api $api, LoggerInterface $logger, $derivativeName, array $derivativeOptions, $targetDir, ContaoFramework $contaoFramework, $rootDir, $uploadPath)
-    {
-        $this->api = $api;
-        $this->logger = $logger;
-        $this->derivativeName = $derivativeName;
-        $this->derivativeOptions = $derivativeOptions;
-        $this->targetDir = trim($targetDir, '/');
-        $this->contaoFramework = $contaoFramework;
-        $this->rootDir = $rootDir;
-        $this->uploadPath = $uploadPath;
-        $this->filesystem = new Filesystem();
+    public function __construct(
+        private readonly VirtualFilesystemInterface $virtualFilesystem,
+        private readonly Api $api,
+        private readonly LoggerInterface $logger,
+        private $derivativeName,
+        private array $derivativeOptions,
+        private string $targetDir,
+    ) {
     }
 
     /**
-     * @param string $mediaId
-     *
      * @return string|false the Contao file system UUID on success or false if something went wrong
      */
-    public function importImage($mediaId)
+    public function importImage(string $mediaId): string|false
     {
-        /** @var $promise \GuzzleHttp\Promise\PromiseInterface */
+        /** @var PromiseInterface $promise */
         $promise = $this->api->getAssetBankManager()->getMediaInfo($mediaId);
         $media = $promise->wait();
 
-        $uri = sprintf('images/media/%s/derivatives/%s/',
-            $mediaId,
-            $this->derivativeName
-        );
+        $uri = $this->buildDerivativeUri($mediaId);
 
-        if (0 !== \count($this->derivativeOptions)) {
-            // Force booleans to be passed as booleans (http_build_query() converts false to 0)
-            $options = $this->derivativeOptions;
-            array_walk($options, function (&$v) {
-                if (true === $v) {
-                    $v = 'true';
-                }
-                if (false === $v) {
-                    $v = 'false';
-                }
-            });
-
-            $uri .= '?' . http_build_query($options, null, '&');
-        }
+        $client = (new RetryableHttpClient(HttpClient::create())) // Retry
+            ->withOptions(
+                (new HttpOptions())
+                    ->setBaseUri($this->api->getBaseUrl())
+                    ->toArray(),
+            )
+        ;
 
         try {
-            $stack = HandlerStack::create();
-            $stack->push(Middleware::retry(function (
-                $retries,
-                Request $request,
-                Response $response = null,
-            ) {
-                if ($retries >= 5) {
-                    return false;
-                }
-
-                if ($response && 202 === $response->getStatusCode()) {
-                    return true;
-                }
-
-                return false;
-            }, function ($retries) {
-                if ($retries >= 5) {
-                    return 0;
-                }
-
-                return 4000; // 4 seconds
-            }));
-
-            $client = new Client([
-                'handler' => $stack,
-            ]);
-
-            $result = $client->request('GET', $uri, [
-                'base_uri' => $this->api->getBaseUrl(),
-                'allow_redirects' => true,
-                'timeout' => 30, // In seconds
-            ]);
-        } catch (RequestException $e) {
-            $this->logger->error('Could not import the Bynder derivative.', [
-                'exception' => $e,
-            ]);
+            $response = $client->request('GET', $uri);
+            $headers = $response->getHeaders();
+            $fileContents = $response->getContent();
+        } catch (ExceptionInterface $e) {
+            $this->logger->error(
+                'Could not import the Bynder derivative.',
+                [
+                    'exception' => $e,
+                ],
+            );
 
             return false;
         }
 
         // Only allow jpeg and png
-        switch ($contentType = $result->getHeader('Content-Type')[0]) {
+        switch ($contentType = $headers['content-type'][0] ?? '') {
             case 'image/jpeg':
                 $extension = 'jpg';
                 break;
@@ -172,87 +72,58 @@ class ImageHandler
                 $extension = 'png';
                 break;
             default:
-                $this->logger->error('Could not import the Bynder derivative because the content type did not match. Got ' . $contentType, [
-                    'content-type' => $contentType,
-                ]);
+                $this->logger->error(sprintf('Could not import Bynder derivative for Media ID "%s" because the Content-Type did not match. Got "%s".', $mediaId, $contentType));
 
                 return false;
         }
 
-        $content = $result->getBody()->getContents();
+        $media['name'] = trim($media['name']);
 
         // Dump the contents
         $this->ensureTargetDirIsPublic();
-        $absoluteTargetPath = $this->getTargetPathForMediaId($media['name'], $extension);
-        $this->filesystem->dumpFile($absoluteTargetPath, $content);
-        $relativePath = $this->getUploadPathRelativePath($absoluteTargetPath);
+        $targetPath = $this->getTargetPathForMediaId($media['name'], $extension);
+        $this->virtualFilesystem->write($targetPath, $fileContents);
+        $item = $this->virtualFilesystem->get($targetPath);
+        $uuid = $item->getUuid()?->toRfc4122();
 
-        /** @var Dbafs $dbafs */
-        $dbafs = $this->contaoFramework->getAdapter(Dbafs::class);
+        if (null === $uuid) {
+            $this->logger->error(sprintf('Could not assign a UUID to the Bynder derivative for Media ID "%s".', $mediaId));
 
-        // Test if the hash already exists
-        $filesModel = $this->contaoFramework->getAdapter(FilesModel::class)->findOneBy('bynder_id', $mediaId);
-
-        // We already have a file with this media ID but apparently it has changed (otherwise we shouldn't land here)
-        if (null !== $filesModel) {
-            $model = $dbafs->moveResource($filesModel->path, $relativePath);
-        } else {
-            // New addition
-            $model = $dbafs->addResource($relativePath);
-            $model->bynder_id = $mediaId;
+            return false;
         }
 
-        // Update the Bynder hash
-        $model->bynder_hash = $media['idHash'];
-        $model->save();
+        $imageDimensions = [];
 
-        return StringUtil::binToUuid($model->uuid);
+        if (\is_array($tmp = @getimagesizefromstring($fileContents))) {
+            $imageDimensions['width'] = $tmp[0];
+            $imageDimensions['height'] = $tmp[1];
+        }
+
+        $this->virtualFilesystem->setExtraMetadata($targetPath, [
+            self::MEDIA_KEY => $media,
+            self::IMAGE_DIMENSIONS_KEY => $imageDimensions,
+        ]);
+
+        return $uuid;
     }
 
-    /**
-     * @param $absolutePath
-     *
-     * @return string
-     */
-    private function getUploadPathRelativePath($absolutePath)
+    private function getTargetPathForMediaId(string $name, string $extension): string
     {
-        return rtrim($this->filesystem->makePathRelative($absolutePath, $this->getAbsoluteProjectDir()), '/');
-    }
-
-    /**
-     * @param string $name
-     * @param string $extension
-     *
-     * @return string
-     */
-    private function getTargetPathForMediaId($name, $extension)
-    {
-        $subfolder = '';
+        $subfolder = trim($this->targetDir, '/').'/';
 
         if (mb_strlen($name) >= 2) {
-            $subfolder = mb_strtolower(mb_substr($name, 0, 1))
-                . mb_strtolower(mb_substr($name, 1, 1))
-                . \DIRECTORY_SEPARATOR;
+            $subfolder .= mb_strtolower(mb_substr($name, 0, 1))
+                .mb_strtolower(mb_substr($name, 1, 1))
+                .'/';
         }
 
-        $path = $this->getAbsoluteTargetDir()
-            . \DIRECTORY_SEPARATOR
-            . $subfolder
-            . $name
-            . '.'
-            . $extension;
+        $path = $subfolder.$name.'.'.$extension;
 
-        // Check if already exists
+        // Check if already exists and increase index until we have a valid file name
         $index = 1;
-        while ($this->filesystem->exists($path)) {
-            $path = $this->getAbsoluteTargetDir()
-                . \DIRECTORY_SEPARATOR
-                . $subfolder
-                . $name
-                . '_' . $index
-                . '.'
-                . $extension;
 
+        while ($this->virtualFilesystem->fileExists($path)) {
+            $path = $subfolder.$name.'_'.$index.'.'.$extension;
             ++$index;
         }
 
@@ -260,41 +131,49 @@ class ImageHandler
     }
 
     /**
-     * @return string
-     */
-    private function getAbsoluteProjectDir()
-    {
-        return realpath($this->rootDir);
-    }
-
-    /**
-     * @return string
-     */
-    private function getAbsoluteTargetDir()
-    {
-        return $this->getAbsoluteProjectDir()
-            . \DIRECTORY_SEPARATOR
-            . $this->uploadPath
-            . \DIRECTORY_SEPARATOR
-            . $this->targetDir
-            ;
-    }
-
-    /**
      * Ensure the target dir is public and symlinked.
      */
-    private function ensureTargetDirIsPublic()
+    private function ensureTargetDirIsPublic(): void
     {
-        $file = $this->getAbsoluteTargetDir()
-            . \DIRECTORY_SEPARATOR
-            . '.public';
-
-        if (!file_exists($file)) {
-            $fs = new Filesystem();
-            $fs->dumpFile($file, '');
-
-            $automator = new Automator();
-            $automator->generateSymlinks();
+        if (!$this->virtualFilesystem->directoryExists($this->targetDir)) {
+            $this->virtualFilesystem->createDirectory($this->targetDir);
         }
+
+        $publicFile = trim($this->targetDir, '/').'/.public';
+
+        if (!$this->virtualFilesystem->fileExists($publicFile)) {
+            $this->virtualFilesystem->write($publicFile, '');
+
+            // Generate symlinks, unfortunately no nice way via DI yet
+            (new Automator())->generateSymlinks();
+        }
+    }
+
+    private function buildDerivativeUri(string $mediaId): string
+    {
+        $uri = sprintf('images/media/%s/derivatives/%s/',
+            $mediaId,
+            $this->derivativeName,
+        );
+
+        if (0 !== \count($this->derivativeOptions)) {
+            // Force booleans to be passed as booleans (http_build_query() converts false to 0)
+            $options = $this->derivativeOptions;
+            array_walk(
+                $options,
+                static function (&$v): void {
+                    if (true === $v) {
+                        $v = 'true';
+                    }
+                    if (false === $v) {
+                        $v = 'false';
+                    }
+                },
+            );
+
+            $uri .= '?'.http_build_query($options, '', '&');
+        }
+
+        return $uri;
     }
 }

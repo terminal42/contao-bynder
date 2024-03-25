@@ -1,13 +1,13 @@
 {
   "devDependencies": {
-    "@symfony/webpack-encore": "^0.22.1",
-    "node-sass": "^4.10.0",
-    "sass-loader": "^7.0.1",
-    "vue": "^2.5.17",
-    "vue-loader": "^15.0.11",
-    "vue-template-compiler": "^2.5.17"
+    "@terminal42/contao-build-tools": "./vendor/terminal42/contao-build-tools/webpack",
+    "vue": "^2.5",
+    "vue-loader": "^15.9.5",
+    "vue-template-compiler": "^2.7.16"
   },
   "dependencies": {
+    "@loadingio/loading.css": "^3.2.0",
+    "ldbutton": "^2.0.4",
     "vue-resource": "^1.5.1"
   }
 }
