@@ -7,6 +7,7 @@ namespace Terminal42\ContaoBynder\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Contao\System;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use GuzzleHttp\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -154,7 +155,7 @@ class ApiController
         $stmt = $this->connection->executeQuery(
             'SELECT uuid,bynder_id,bynder_hash FROM tl_files WHERE bynder_id IN (?)',
             [$bynderIds],
-            [Connection::PARAM_INT_ARRAY],
+            [ArrayParameterType::STRING],
         );
 
         $downloaded = [];
