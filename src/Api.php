@@ -9,6 +9,15 @@ use Bynder\Api\Impl\PermanentTokens\Configuration;
 
 class Api extends BynderClient
 {
+    private Configuration $configuration;
+
+    public function __construct(Configuration $configuration)
+    {
+        $this->configuration = $configuration;
+
+        parent::__construct($configuration);
+    }
+
     public function getBaseUrl(): string
     {
         return 'https://'.$this->configuration->getBynderDomain();
